@@ -5,4 +5,5 @@
 ## Version: r0
 
 libs\ObeliskFramework\ObeliskInclude.xml
-
+containerSlotManager.lua
+bagFrame.lua
