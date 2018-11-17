@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="OB_TOGGLE" header="OB_H">
+		ObeliskBags_ToggleBags();
+	</Binding>
+</Bindings>
