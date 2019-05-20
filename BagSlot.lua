@@ -14,7 +14,7 @@ setmetatable(ns.BagSlot, {
 
 local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 0)
 if not FrameworkClass then
-	error(ns.Debug:sprint(libraryName, "Failed to load ObeliskFrameworkClass"))
+	error(ns.Debug:sprint(addonName .. "BagSlot", "Failed to load ObeliskFrameworkClass"))
 end
 
 ---------------
@@ -61,6 +61,15 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	return instance
 end
 
+function ns.BagSlot:SetItem(itemId)
+	if type(itemId) == "number" then
+		local item = ns.ItemCache:GetInfo(itemId, true)
+		self:SetIcon(item.icon)
+	else
+		self:SetIcon(nil)
+	end
+end
+
 function ns.BagSlot:SetIcon(icon)
 	self.ItemSlot.Icon:SetTexture(icon)
 end
@@ -68,5 +77,15 @@ end
 function ns.BagSlot:GetIdentifier(bagId, slotId)
 	bagId = bagId or self:GetID()
 	slotId = slotId or self.ItemSlot:GetID()
-	return bagId .. slotId
+
+	if slotId < 10 then
+		return bagId .. "0" .. slotId
+	else
+		return bagId .. slotId
+	end
+
+end
+
+function ns.BagSlot:GetDebugText()
+	return self:GetIdentifier()
 end

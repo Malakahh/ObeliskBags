@@ -6,6 +6,6 @@
 
 libs\ObeliskFramework\ObeliskInclude.xml
 bindings.lua
+ItemCache.lua
 BagSlot.lua
-containerSlotManager.lua
-bagFrame.lua
+BagFrame.lua
