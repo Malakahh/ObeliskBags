@@ -1,4 +1,6 @@
 local addonName, ns = ...
+local className = "BagFrame"
+
 ns.BagFrame = {}
 
 setmetatable(ns.BagFrame, {
@@ -14,57 +16,41 @@ setmetatable(ns.BagFrame, {
 
 local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 0)
 if not FrameworkClass then
-	error(ns.Debug:sprint(addonName .. "BagFrame", "Failed to load ObeliskFrameworkClass"))
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskFrameworkClass"))
 end
 
 local libGridView = ObeliskFrameworkManager:GetLibrary("ObeliskGridView", 1)
 if not libGridView then
-	error(ns.Debug:sprint(addonName .. "BagFrame", "Failed to load ObeliskGridView"))
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskGridView"))
 end
+
+
 
 -----------
 -- local --
 -----------
 
-local cellSize = 24
-local slots = {}
 
-do
-	local bagNum
-	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-		local maxNumSlots = GetContainerNumSlots(bagNum)
-		local slotNum
-		for slotNum = 1, maxNumSlots do
-			local slot = ns.BagSlot:New(bagNum, slotNum)
-			slot:SetSize(cellSize, cellSize)
-			slots[slot:GetIdentifier()] = slot
-		end
-	end
-end
-
-local frame = CreateFrame("FRAME")
-frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
-frame:RegisterEvent("BAG_UPDATE")
-
-function frame:BAG_UPDATE(bagId)
-	local maxNumSlots = GetContainerNumSlots(bagId)
-	local i
-	for i = 1, maxNumSlots do
-		local slot = slots[ns.BagSlot:GetIdentifier(bagId, i)]
-
-		if slot ~= nil then
-			local itemId = GetContainerItemID(bagId, slot.ItemSlot:GetID())
-			slot:SetItem(itemId)
-		end
-	end
-end
+local isShown = true
+local createdBags = {}
 
 -----------
 -- Class --
 -----------
 
 function ns.BagFrame:New(isMasterBag)
-	local instance = FrameworkClass(self, "FRAME", "ObeliskBagsBagFrame", UIParent)
+	if isMasterBag and ns.MasterBag then
+		error(ns.Debug:sprint(addonName .. className, "Attempted to create multiple master bags"))
+		return
+	end
+
+	local name = addonName .. className
+	if isMasterBag then
+		name = name .. "Master"
+	end
+
+	local instance = FrameworkClass(self, "FRAME", name, UIParent)
+	instance.IsMasterBag = isMasterBag
 
 	instance.padding = 6
 	instance.spacing = 6
@@ -80,8 +66,6 @@ function ns.BagFrame:New(isMasterBag)
 		insets = { left = 4, right = 4, top = 4, bottom = 4}
 	})
 	instance:SetBackdropColor(0, 0, 0, 1)
-	instance:SetClampedToScreen(true)
-	instance:SetSize(200, 300)
 
 	-- Title
 	instance.Title = instance:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
@@ -90,50 +74,124 @@ function ns.BagFrame:New(isMasterBag)
 
 	-- gridView
 	instance.GridView = libGridView(0, 0, "GridView", instance)
-	instance.GridView:SetCellSize(cellSize, cellSize)
+	instance.GridView:SetCellSize(ns.CellSize, ns.CellSize)
+	instance.GridView:SetCellMargin(2,2)
 	instance.GridView:SetPoint("TOPLEFT", instance.Title, "BOTTOMLEFT", 0, -instance.spacing)
 	instance.GridView:SetPoint("BOTTOMRIGHT", -instance.padding, instance.padding)
 
 	instance.GridView:ToggleDebug()
 
+	-- frame movement
+	instance:SetMovable(true)
+	instance:SetClampedToScreen(true)
+
+	instance:SetScript("OnMouseDown", function(self, btn)
+		if btn == "LeftButton" and IsShiftKeyDown() then
+			self:ClearAllPoints()
+			self:StartMoving()
+		end
+	end)
+
+	instance:SetScript("OnMouseUp", function(self, btn)
+		self:StopMovingOrSizing()
+	end)
+
+	-- Master bag
+	if isMasterBag then
+		-- Manually add to gridview to skip adding to available pool again
+		for i = 1, ns.InventorySlotPool:Count() do
+			instance.GridView:AddItem(ns.InventorySlotPool.items[i])
+		end
+
+		instance.BtnNewBag = CreateFrame("Button", addonName .. "NewBagButton", instance, "UIPanelButtonTemplate")
+		instance.BtnNewBag:SetSize(100, 19)
+		instance.BtnNewBag:SetPoint("TOPRIGHT", instance, "TOPRIGHT", -instance.padding, instance.padding)
+		instance.BtnNewBag:SetText("New Bag")
+
+		instance.BtnNewBag:SetScript("OnClick", function(btn)
+			ns.BagSetupFrame:Show()
+		end)
+
+		ns.MasterBag = instance
+	else
+		instance.BtnDelete = CreateFrame("Button", addonName .. "DeleteButton", instance, "UIPanelButtonTemplate")
+		instance.BtnDelete:SetSize(100, 19)
+		instance.BtnDelete:SetPoint("TOPRIGHT", instance, "TOPRIGHT", -instance.padding, instance.padding)
+		instance.BtnDelete:SetText("Delete bag")
+
+		instance.BtnDelete:SetScript("OnClick", function(btn)
+			instance:MergeBag(ns.MasterBag)
+			ns.MasterBag:Update()
+		end)
+	end
+
+	table.insert(createdBags, instance)
+
 	return instance
+end
+
+function ns.BagFrame:MergeBag(target)
+	while #self.GridView.items > 0 do
+		local slot = self.GridView.items[1]
+		self:RemoveSlot(slot)
+		target:AddSlot(slot)
+	end
+
+	self:Hide()
+end
+
+function ns.BagFrame:Sort()
+	local compFunc = function(a, b) return a:GetIdentifier() < b:GetIdentifier() end
+	self.GridView:Sort(compFunc)
+
+	if self.IsMasterBag then
+		table.sort(ns.InventorySlotPool.items, compFunc)
+	end
 end
 
 function ns.BagFrame:AddSlot(slot)
 	self.GridView:AddItem(slot)
+
+	if self.IsMasterBag then
+		ns.InventorySlotPool:Push(slot)
+	end
 end
 
 function ns.BagFrame:RemoveSlot(slot)
 	self.GridView:RemoveItem(slot)
 end
 
-function ns.BagFrame:UpdateGridView()
+function ns.BagFrame:Update()
+	local gridWidth, gridHeight = self.GridView:GetCalculatedGridSize()
+
+	if gridWidth == nil then
+		error(ns.Debug:sprint(className, "Failed to calculate grid width"))
+	end
+
+	if gridHeight == nil then
+		error(ns.Debug:sprint(className, "Failed to calculate grid height"))
+	end
+
+	gridWidth = gridWidth + self.padding * 2
+	self:SetWidth(gridWidth)
+
+	gridHeight = gridHeight + self.padding * 2 + self.Title:GetHeight() + self.spacing
+	self:SetHeight(gridHeight)
+
+	self:Sort()
 	self.GridView:Update()
 end
 
-local masterBag = ns.BagFrame:New(true)
-do
-	local bagNum
-	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-		local maxNumSlots = GetContainerNumSlots(bagNum)
-		local slotNum
-		for slotNum = 1, maxNumSlots do
-			masterBag:AddSlot(slots[ns.BagSlot:GetIdentifier(bagNum, slotNum)])
+function ns.BagFrame:ToggleBags()
+	for k,v in pairs(createdBags) do
+		if isShown then
+			v:Hide()
+		else
+			v:Show()
 		end
 	end
-end
 
-masterBag:UpdateGridView()
-
-function ns.BagFrame:ToggleBags()
-	-- print("Hi")
-	-- print(masterBag:GetName())
-	if masterBag:IsShown() then
-		masterBag:Hide()
-	else
-		masterBag:Show()
-		--masterBag:OnShow()
-	end
+	isShown = not isShown
 end
 
 

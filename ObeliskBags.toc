@@ -9,3 +9,5 @@ bindings.lua
 ItemCache.lua
 BagSlot.lua
 BagFrame.lua
+BagSetupFrame.lua
+main.lua

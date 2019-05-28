@@ -33,6 +33,7 @@ function ns.BagSlot:New(bagId, slotId, parent)
 
 	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. self:GetIdentifier(bagId, slotId), instance, "ContainerFrameItemButtonTemplate")
 	slot:SetID(slotId)
+	--slot.NewItemTexture:Hide()
 	slot:SetPoint("TOPLEFT")
 	slot:SetPoint("BOTTOMRIGHT")
 	slot:Show()
