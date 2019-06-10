@@ -29,7 +29,6 @@ ns.BagSetupFrame:Hide()
 -- Title
 ns.BagSetupFrame.Title = ns.BagSetupFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 ns.BagSetupFrame.Title:SetPoint("TOP", 0, -padding)
-ns.BagSetupFrame.Title:SetText("New Bag")
 
 -- Btn Cancel
 ns.BagSetupFrame.BtnCancel = CreateFrame("Button", addonName .. className .. "Cancel", ns.BagSetupFrame, "UIPanelButtonTemplate")
@@ -46,32 +45,7 @@ ns.BagSetupFrame.BtnCreate:SetSize(100, 22)
 ns.BagSetupFrame.BtnCreate:SetPoint("RIGHT", ns.BagSetupFrame.BtnCancel, "LEFT", -padding, 0)
 ns.BagSetupFrame.BtnCreate:SetText("Create")
 ns.BagSetupFrame.BtnCreate:SetScript("OnClick", function(btn)
-	local bag = ns.BagFrame:New(false)
-	bag.GridView:SetNumColumns(ns.BagSetupFrame.ColumnSlider:GetValue())
-
-	-- get slots
-	local slots = {}
-	for i = 1, ns.BagSetupFrame.SlotSlider:GetValue(), 1 do
-		local slot = ns.InventorySlotPool:Pop()
-		table.insert(slots, slot)
-	end
-
-	table.sort(slots, function (a, b)
-		return a:GetIdentifier() < b:GetIdentifier()
-	end)
-
-	for i = 1, #slots do
-		ns.MasterBag:RemoveSlot(slots[i])
-	 	bag:AddSlot(slots[i])
-	end
-
-	-- Handle size of bag
-	local gridWidth, gridHeight = bag.GridView:GetCalculatedGridSize()
-	bag:SetSize(gridWidth, gridHeight)
-	bag:Update()
-
-	ns.MasterBag:Update()
-
+	ns.BagFrame.Spawn(ns.BagSetupFrame.ColumnSlider:GetValue(), ns.BagSetupFrame.SlotSlider:GetValue())
 	ns.BagSetupFrame:Hide()
 end)
 
@@ -123,4 +97,16 @@ function ns.BagSetupFrame:ResetForms()
 	_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "Low"]:SetText(1)
 	_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "High"]:SetText(slotDefault)
 	self.ColumnSlider:SetValue(1)
+end
+
+function ns.BagSetupFrame:Open(bagframe, isEdit)
+	if isEdit then
+		self:ResetForms()
+		ns.BagSetupFrame.Title:SetText("Edit - " .. bagframe.Title:GetText())
+	else
+		self:ResetForms()
+		ns.BagSetupFrame.Title:SetText("New Bag")
+	end
+
+
 end

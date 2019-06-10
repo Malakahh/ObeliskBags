@@ -13,7 +13,7 @@ function ns.ItemCache:GetInfo(itemId, updateCache)
 	end
 
 	local item = {}
-	item.name, _, item.rarity, _, _, _, _, _, _, item.icon = GetItemInfo(itemId)
+	item.name, _, item.rarity, _, _, item.itemType, _, _, _, item.icon = GetItemInfo(itemId)
 
 	self.cache[itemId] = item
 	return item

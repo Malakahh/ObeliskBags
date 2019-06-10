@@ -38,6 +38,8 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	slot:SetPoint("BOTTOMRIGHT")
 	slot:Show()
 
+	slot.BattlepayItemTexture:Hide()
+
 	local icon = slot:CreateTexture(slot:GetName() .. "IconTexture", "BACKGROUND")
 	icon:SetAllPoints()
 
@@ -49,10 +51,23 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	highlightTexture:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
 	highlightTexture:SetAllPoints()
 
+	slot.ItemCount = slot:CreateFontString(slot:GetName() .. "Count", "ARTWORK", "NumberFontNormal")
+	slot.ItemCount:SetJustifyH("RIGHT")
+	slot.ItemCount:SetPoint("BOTTOMRIGHT", -5, 2)
+
+	slot.IconBorder = slot:CreateTexture(slot:GetName() .. "IconBorder", "BORDER")
+	slot.IconBorder:SetTexture("Interface\\Common\\WhiteIconFrame");
+	slot.IconBorder:SetAllPoints()
+	slot.IconBorder:Hide()
+
+	slot.IconQuestTexture = slot:CreateTexture(slot:GetName() .. "IconQuestTexture", "OVERLAY")
+	slot.IconQuestTexture:SetAllPoints()
+	slot.IconQuestTexture:Hide()
+
 	slot.Icon = icon
 	slot:SetPushedTexture(pushedTexture)
 	slot:SetHighlightTexture(highlightTexture)
-	slot:SetNormalTexture("")
+	--slot:SetNormalTexture("")
 	slot.PushedTexture = pushedTexture
 	slot.HighlightTexture = highlightTexture
 
@@ -62,12 +77,46 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	return instance
 end
 
+
+
 function ns.BagSlot:SetItem(itemId)
 	if type(itemId) == "number" then
 		local item = ns.ItemCache:GetInfo(itemId, true)
-		self:SetIcon(item.icon)
+
+		local bagId = self:GetID()
+		local slotId = self.ItemSlot:GetID()
+		local isQuestItem, questId, questIsActive = GetContainerItemQuestInfo(bagId, slotId)
+		local texture, count, _, quality, _, _, _, isFiltered = GetContainerItemInfo(bagId, slotId)
+
+		self:SetIcon(texture)
+
+		if quality and quality >= LE_ITEM_QUALITY_COMMON and BAG_ITEM_QUALITY_COLORS[quality] then
+			self.ItemSlot.IconBorder:SetVertexColor(BAG_ITEM_QUALITY_COLORS[quality].r, BAG_ITEM_QUALITY_COLORS[quality].g, BAG_ITEM_QUALITY_COLORS[quality].b);
+			self.ItemSlot.IconBorder:Show()
+		else
+			self.ItemSlot.IconBorder:Hide()
+		end
+
+		if count > 1 then
+			self.ItemSlot.ItemCount:SetText(count)
+		else
+			self.ItemSlot.ItemCount:SetText(nil)
+		end
+
+		if ( questId and not questIsActive ) then
+			self.ItemSlot.IconQuestTexture:SetTexture("Interface\\ContainerFrame\\UI-Icon-QuestBang");
+			self.ItemSlot.IconQuestTexture:Show();
+		elseif ( questId or isQuestItem ) then
+			self.ItemSlot.IconQuestTexture:SetTexture("Interface\\ContainerFrame\\UI-Icon-QuestBorder");
+			self.ItemSlot.IconQuestTexture:Show();		
+		else
+			self.ItemSlot.IconQuestTexture:Hide();
+		end
 	else
 		self:SetIcon(nil)
+		self.ItemSlot.IconBorder:Hide()
+		self.ItemSlot.ItemCount:SetText(nil)
+		self.ItemSlot.IconQuestTexture:Hide();
 	end
 end
 

@@ -61,6 +61,12 @@ function frame:PLAYER_ENTERING_WORLD()
 
 	local masterBag = ns.BagFrame:New(true)
 	masterBag.GridView:SetNumColumns(10)
+
+	local bagNum
+	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+		self:BAG_UPDATE(bagNum)
+	end
+
 	masterBag:Update()
 end
 
@@ -76,3 +82,34 @@ function frame:BAG_UPDATE(bagId)
 		end
 	end
 end
+
+-- local CycleSort = ObeliskFrameworkManager:GetLibrary("ObeliskCycleSort", 0)
+-- if not CycleSort then
+-- 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCycleSort"))
+-- end
+
+-- local funcs = {
+-- 	Compare = function(arr, val1, val2)
+-- 		if arr[val1] < arr[val2] then
+-- 			return -1
+-- 		elseif arr[val1] > arr[val2] then
+-- 			return 1
+-- 		else
+-- 			return 0
+-- 		end
+-- 	end,
+-- 	Swap = function(arr, val1, val2)
+-- 		local temp = arr[val1]
+-- 		arr[val1] = arr[val2]
+-- 		arr[val2] = temp
+-- 	end
+-- }
+-- local t = {2, 23, 4, 2, 123, 2, 5,6,7,8,3,5,43,2,1,0,1,-1,123,2}
+-- do
+-- 	local s = ""
+-- 	for k,v in pairs(t) do
+-- 		s = s .. " " .. v
+-- 	end
+-- 	print(s)
+-- end
+-- CycleSort.Sort(t, funcs)
