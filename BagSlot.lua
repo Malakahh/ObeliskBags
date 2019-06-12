@@ -22,7 +22,7 @@ end
 ---------------
 
 function ns.BagSlot:New(bagId, slotId, parent)
-	local instance = FrameworkClass(self, "FRAME", addonName .. "ItemSlotContainer" .. self:GetIdentifier(bagId, slotId), parent or UIParent)
+	local instance = FrameworkClass(self, "FRAME", addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), parent)
 	instance:SetID(bagId)
 
 	local backgroundTexture = instance:CreateTexture(instance:GetName() .. "NormalTexture", "BACKGROUND")
@@ -31,7 +31,7 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	backgroundTexture:SetAllPoints()
 
 
-	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. self:GetIdentifier(bagId, slotId), instance, "ContainerFrameItemButtonTemplate")
+	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), instance, "ContainerFrameItemButtonTemplate")
 	slot:SetID(slotId)
 	--slot.NewItemTexture:Hide()
 	slot:SetPoint("TOPLEFT")
@@ -76,8 +76,6 @@ function ns.BagSlot:New(bagId, slotId, parent)
 
 	return instance
 end
-
-
 
 function ns.BagSlot:SetItem(itemId)
 	if type(itemId) == "number" then
@@ -124,18 +122,54 @@ function ns.BagSlot:SetIcon(icon)
 	self.ItemSlot.Icon:SetTexture(icon)
 end
 
-function ns.BagSlot:GetIdentifier(bagId, slotId)
-	bagId = bagId or self:GetID()
-	slotId = slotId or self.ItemSlot:GetID()
+function ns.BagSlot:SetOwner(bag)
+	self.Owner = bag
+end
 
+function ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)
 	if slotId < 10 then
+		return bagId .. "00" .. slotId
+	elseif slotId < 100 then
 		return bagId .. "0" .. slotId
 	else
 		return bagId .. slotId
 	end
-
 end
 
+function ns.BagSlot.DecodeSlotIdentifier(slotIdentifier)
+	local slotId = string.sub(slotIdentifier, -3)
+	local bagId = string.sub(slotIdentifier, 1, -4)
+
+	return bagId, slotId
+end
+
+function ns.BagSlot:GetPhysicalIdentifier()
+	local bagId = self:GetID()
+	local slotId = self.ItemSlot:GetID()
+
+	return ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)
+end
+
+function ns.BagSlot:GetVirtualIdentifier()
+	local bagId = self.Owner.Id
+	local slotId = ns.Util.Table.IndexOf(self.Owner.GridView.items, self)
+
+	return ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)
+end
+
+-- function ns.BagSlot:GetIdentifier(bagId, slotId)
+-- 	bagId = bagId or self:GetID()
+-- 	slotId = slotId or self.ItemSlot:GetID()
+
+-- 	if slotId < 10 then
+-- 		ns.BagSlot.DecodeSlotIdentifier(bagId .. "0" .. slotId)
+-- 		return bagId .. "0" .. slotId
+-- 	else
+-- 		ns.BagSlot.DecodeSlotIdentifier(bagId .. slotId)
+-- 		return bagId .. slotId
+-- 	end
+-- end
+
 function ns.BagSlot:GetDebugText()
-	return self:GetIdentifier()
+	return self:GetPhysicalIdentifier()
 end

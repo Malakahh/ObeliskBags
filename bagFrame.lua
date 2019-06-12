@@ -24,7 +24,10 @@ if not libGridView then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskGridView"))
 end
 
-
+local CycleSort = ObeliskFrameworkManager:GetLibrary("ObeliskCycleSort", 0)
+if not CycleSort then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCycleSort"))
+end
 
 -----------
 -- local --
@@ -33,52 +36,83 @@ end
 local isShown = true
 local createdBags = {}
 
-local function DefragBags()
-	print("DefragBags called")
-
-	local foundFreeSlot = false
-
-	-- free slots
-	for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-		local numberOfFreeSlots, bagType = GetContainerNumFreeSlots(i)
-		if numberOfFreeSlots > 0 and bagType == 0 then
-			foundFreeSlot = true
+local cycleSortFuncs = {
+	Compare = function(arr, val1, val2)
+		if arr[val1].virt < arr[val2].virt then
+			return -1
+		elseif arr[val1].virt > arr[val2].virt then
+			return 1
+		else
+			return 0
 		end
-	end
+	end,
+	Swap = function(arr, val1, val2)
+		local temp = arr[val1].virt
+		arr[val1].virt = arr[val2].virt
+		arr[val2].virt = temp
 
-	if not foundFreeSlot then
-		print(addonName .. ": Cannot perform defragmentation, no free regular bag slots")
-		return
+		local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(arr[val1].phys)
+		local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(arr[val2].phys)
+
+		PickupContainerItem(bagId1, slotId1)
+		PickupContainerItem(bagId2, slotId2)
 	end
+}
+
+local function DefragBags()
+	ClearCursor()
+
+	-- Reorder createdBags, so that we can get proper Ids
+	createdBags = ns.Util.Table.Arrange(createdBags)
 
 	-- Gather old bag data
 	local oldBagData = {}
-	for i = #createdBags, 1, -1 do
+	local oldSlots = {}
+	for i = 1, #createdBags do
+		createdBags[i].Id = i
+		local gridView = createdBags[i].GridView
+
+		for k = 1, #gridView.items do
+			oldSlots[#oldSlots + 1] = {
+				phys = gridView.items[k]:GetPhysicalIdentifier(),
+				virt = gridView.items[k]:GetVirtualIdentifier()
+			}
+		end
+
 		if not createdBags[i].IsMasterBag then
 			oldBagData[i] = {
-				numColumns = createdBags[i].GridView:GetNumColumns(),
-				numSlots = createdBags[i].GridView:ItemCount()
+				numColumns = gridView:GetNumColumns(),
+				numSlots = gridView:ItemCount(),
 			}
+		end
+	end
+
+	-- Delete old bags
+	for i = #createdBags, 1, -1 do
+		if not createdBags[i].IsMasterBag then
 			createdBags[i]:DeleteBag()
 		end
 	end
 
-	-- Remove oldB
-	-- do
-	-- 	local max = #createdBags
-	-- 	for i = max, 1, -1 do
-	-- 		print("Deleting " .. i .. "...")
-
-	-- 		if not createdBags[i].IsMasterBag then
-	-- 			createdBags[i]:DeleteBag()
-	-- 		end
-	-- 	end
-	-- end
-
-
-	for k,v in pairs(oldBagData) do
+	-- Spawn new bags
+	for _,v in pairs(oldBagData) do
 		ns.BagFrame.Spawn(v.numColumns, v.numSlots)
 	end
+
+	-- Restore items to virtual positions
+	local newSlots = {}
+	for i = 1, #createdBags do
+		local gridView = createdBags[i].GridView
+
+		for n = 1, #gridView.items do
+			local idx = ns.Util.Table.IndexWhere(oldSlots, function(k,v,...)
+				return v.phys == gridView.items[n]:GetPhysicalIdentifier()
+			end)
+
+			newSlots[#newSlots + 1] = oldSlots[idx]
+		end
+	end
+	CycleSort.Sort(newSlots, cycleSortFuncs)
 end
 
 -----------
@@ -121,7 +155,6 @@ function ns.BagFrame:New(isMasterBag)
 	-- Title
 	instance.Title = instance:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	instance.Title:SetPoint("TOPLEFT", instance.padding, -instance.padding)
-	instance.Title:SetText("Title")
 
 	-- Btn Close
 	instance.BtnClose = CreateFrame("BUTTON", addonName .. "CloseButton", instance, "UIPanelCloseButtonNoScripts")
@@ -165,7 +198,9 @@ function ns.BagFrame:New(isMasterBag)
 	if isMasterBag then
 		-- Manually add to gridview to skip adding to available pool again
 		for i = 1, ns.InventorySlotPool:Count() do
-			instance.GridView:AddItem(ns.InventorySlotPool.items[i])
+			local slot = ns.InventorySlotPool.items[i]
+			instance.GridView:AddItem(slot)
+			slot:SetOwner(instance)
 		end
 
 		instance.BtnNewBag = CreateFrame("BUTTON", addonName .. "NewBagButton", instance, "UIPanelButtonTemplate")
@@ -206,6 +241,8 @@ function ns.BagFrame:New(isMasterBag)
 	table.insert(createdBags, instance)
 	instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
 
+	instance.Title:SetText("Title - " .. instance.Id)
+
 	return instance
 end
 
@@ -221,7 +258,7 @@ function ns.BagFrame.Spawn(numColumns, numSlots)
 	end
 
 	table.sort(slots, function (a, b)
-		return a:GetIdentifier() < b:GetIdentifier()
+		return a:GetPhysicalIdentifier() < b:GetPhysicalIdentifier()
 	end)
 
 	for i = 1, #slots do
@@ -253,8 +290,8 @@ function ns.BagFrame:MergeBag(target)
 	self:Hide()
 end
 
-function ns.BagFrame:Sort()
-	local compFunc = function(a, b) return a:GetIdentifier() < b:GetIdentifier() end
+function ns.BagFrame:SortSlots()
+	local compFunc = function(a, b) return a:GetPhysicalIdentifier() < b:GetPhysicalIdentifier() end
 	self.GridView:Sort(compFunc)
 
 	if self.IsMasterBag then
@@ -264,6 +301,7 @@ end
 
 function ns.BagFrame:AddSlot(slot)
 	self.GridView:AddItem(slot)
+	slot:SetOwner(self)
 
 	if self.IsMasterBag then
 		ns.InventorySlotPool:Push(slot)
@@ -290,14 +328,11 @@ function ns.BagFrame:Update()
 
 	local width = gridWidth + self.padding * 2
 	local height = gridHeight + self.BtnClose:GetHeight() + self.padding + self.btnHeight
-	if self.IsMasterBag then
-
-	end
 
 	self:SetWidth(width)
 	self:SetHeight(height)
 
-	self:Sort()
+	self:SortSlots()
 	self.GridView:Update()
 end
 

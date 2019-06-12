@@ -33,7 +33,7 @@ local function CollectInventorySlots()
 			for slotNum = 1, maxNumSlots do
 				local slot = ns.BagSlot:New(bagNum, slotNum)
 				slot:SetSize(ns.CellSize, ns.CellSize)
-				allInventorySlots[slot:GetIdentifier()] = slot
+				allInventorySlots[slot:GetPhysicalIdentifier()] = slot
 			end
 		end
 	end
@@ -50,7 +50,7 @@ local function CollectInventorySlots()
 			local maxNumSlots = GetContainerNumSlots(bagNum)
 			local slotNum
 			for slotNum = 1, maxNumSlots do
-				ns.InventorySlotPool:Push(allInventorySlots[ns.BagSlot:GetIdentifier(bagNum, slotNum)])
+				ns.InventorySlotPool:Push(allInventorySlots[ns.BagSlot.EncodeSlotIdentifier(bagNum, slotNum)])
 			end
 		end
 	end
@@ -74,7 +74,7 @@ function frame:BAG_UPDATE(bagId)
 	local maxNumSlots = GetContainerNumSlots(bagId)
 	local i
 	for i = 1, maxNumSlots do
-		local slot = allInventorySlots[ns.BagSlot:GetIdentifier(bagId, i)]
+		local slot = allInventorySlots[ns.BagSlot.EncodeSlotIdentifier(bagId, i)]
 
 		if slot ~= nil then
 			local itemId = GetContainerItemID(bagId, slot.ItemSlot:GetID())
