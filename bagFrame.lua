@@ -274,6 +274,38 @@ function ns.BagFrame.Spawn(numColumns, numSlots)
 	ns.MasterBag:Update()
 end
 
+function ns.BagFrame:Serialize()
+	local data = {}
+	data.slots = {}
+	data.numColumns = self.GridView:GetNumColumns()
+
+	for _,v in pairs(self.GridView.items) do
+		table.insert(data.slots, v:GetPhysicalIdentifier())
+	end
+
+	return data
+end
+
+function ns.BagFrame:Deserialize(data)
+	local bag = ns.BagFrame:New(false)
+	bag.GridView:SetNumColumns(data.numColumns)
+
+	local i = 1, #data.slots do
+		local idx = ns.Util.Table.IndexWhere(ns.InventorySlotPool.items, function(k, v, ...)
+			return data.slots[i] == v
+		end)
+
+		local slot = ns.InventorySlotPool.items[idx]
+		ns.Util.Table.RemoveByVal(ns.InventorySlotPool.items, slot)
+		ns.MasterBag:RemoveSlot(slot)
+		bag:AddSlot(slot)
+	end
+
+	-- Handle size of bag
+	local gridWidth, gridHeight = bag.GridView:GetCalculatedGridSize()
+	bag
+end
+
 function ns.BagFrame:DeleteBag()
 	self:MergeBag(ns.MasterBag)
 	ns.Util.Table.RemoveByVal(createdBags, self)
