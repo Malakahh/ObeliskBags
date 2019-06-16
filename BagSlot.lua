@@ -33,7 +33,6 @@ function ns.BagSlot:New(bagId, slotId, parent)
 
 	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), instance, "ContainerFrameItemButtonTemplate")
 	slot:SetID(slotId)
-	--slot.NewItemTexture:Hide()
 	slot:SetPoint("TOPLEFT")
 	slot:SetPoint("BOTTOMRIGHT")
 	slot:Show()
@@ -67,7 +66,7 @@ function ns.BagSlot:New(bagId, slotId, parent)
 	slot.Icon = icon
 	slot:SetPushedTexture(pushedTexture)
 	slot:SetHighlightTexture(highlightTexture)
-	--slot:SetNormalTexture("")
+	
 	slot.PushedTexture = pushedTexture
 	slot.HighlightTexture = highlightTexture
 

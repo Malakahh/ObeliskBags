@@ -303,7 +303,10 @@ function ns.BagFrame:Deserialize(data)
 
 	-- Handle size of bag
 	local gridWidth, gridHeight = bag.GridView:GetCalculatedGridSize()
-	bag
+	bag:SetSize(gridWidth, gridHeight)
+	bag:Update()
+
+	ns.MasterBag:Update()
 end
 
 function ns.BagFrame:DeleteBag()
