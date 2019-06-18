@@ -4,15 +4,14 @@ ns.BagSlot = {}
 setmetatable(ns.BagSlot, {
 	__call = function (self, ...)
 		return self:New(...)
-	end,
-	__index = ns.BagSlot
+	end
 })
 
 ---------------
 -- Libraries --
 ---------------
 
-local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 0)
+local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 1)
 if not FrameworkClass then
 	error(ns.Debug:sprint(addonName .. "BagSlot", "Failed to load ObeliskFrameworkClass"))
 end
@@ -22,7 +21,12 @@ end
 ---------------
 
 function ns.BagSlot:New(bagId, slotId, parent)
-	local instance = FrameworkClass(self, "FRAME", addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), parent)
+	local instance = FrameworkClass({
+		prototype = self,
+		frameType = "FRAME",
+		frameName = addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId),
+		parent = parent,
+	})
 	instance:SetID(bagId)
 
 	local backgroundTexture = instance:CreateTexture(instance:GetName() .. "NormalTexture", "BACKGROUND")

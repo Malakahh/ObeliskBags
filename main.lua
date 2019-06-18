@@ -42,6 +42,7 @@ local function CollectInventorySlots()
 	-- Anything in this stack is considered the inventory of the master bag.
 	-- Start by putting all slots into master bag.
 	-- Distribute later
+	ns.InventorySlotPool = libStack:New()
 	ns.InventorySlotPool = libStack()
 
 	do

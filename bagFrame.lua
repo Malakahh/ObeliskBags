@@ -6,15 +6,14 @@ ns.BagFrame = {}
 setmetatable(ns.BagFrame, {
 	__call = function (self, ...)
 		return self:New(...)
-	end,
-	__index = ns.BagFrame
+	end
 })
 
 ---------------
 -- Libraries --
 ---------------
 
-local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 0)
+local FrameworkClass = ObeliskFrameworkManager:GetLibrary("ObeliskFrameworkClass", 1)
 if not FrameworkClass then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskFrameworkClass"))
 end
@@ -119,6 +118,8 @@ end
 -- Class --
 -----------
 
+local shouldSetMetaTable = true
+
 function ns.BagFrame:New(isMasterBag)
 	if isMasterBag and ns.MasterBag then
 		error(ns.Debug:sprint(addonName .. className, "Attempted to create multiple master bags"))
@@ -130,7 +131,13 @@ function ns.BagFrame:New(isMasterBag)
 		name = name .. "Master"
 	end
 
-	local instance = FrameworkClass(self, "FRAME", name, UIParent)
+	local instance = FrameworkClass({
+		prototype = self,
+		frameType = "FRAME",
+		frameName = name,
+		parent = UIParent,
+		inheritsFrame = nil
+	})
 	instance.IsMasterBag = isMasterBag
 
 	---------
