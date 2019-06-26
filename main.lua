@@ -1,7 +1,6 @@
 local addonName, ns = ...
 
--- bit of config
-ns.CellSize = 37
+OB_SV = OB_SV or {}
 
 ---------------
 -- Libraries --
@@ -12,9 +11,16 @@ if not libStack then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCollectionsStack"))
 end
 
+local SavedVariablesManager = ObeliskFrameworkManager:GetLibrary("ObeliskSavedVariablesManager", 0)
+if not SavedVariablesManager then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskSavedVariablesManager"))
+end
+
 -----------
 -- local --
 -----------
+
+local SV_BAGS_STR = "Bags"
 
 local frame = CreateFrame("FRAME")
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
@@ -42,7 +48,6 @@ local function CollectInventorySlots()
 	-- Anything in this stack is considered the inventory of the master bag.
 	-- Start by putting all slots into master bag.
 	-- Distribute later
-	ns.InventorySlotPool = libStack:New()
 	ns.InventorySlotPool = libStack()
 
 	do
@@ -57,18 +62,51 @@ local function CollectInventorySlots()
 	end
 end
 
+local function SpawnBags()
+	local SV_Bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	if #SV_Bags > 0 then -- We have some bags saved, nice!
+		local workingSet = ns.Util.Table.Copy(SV_Bags)
+		local masterBagIdx = ns.Util.Table.IndexWhere(workingSet, function(k, v, ...) return v.IsMasterBag end)
+
+		-- Start with master bag
+		-- ns.BagFrame:New(workingSet[masterBagIdx])
+		-- workingSet[masterBagIdx] = nil
+
+		-- Remaining bags
+		for k,v in pairs(workingSet) do
+			ns.BagFrame:New(v)
+		end
+	else -- This is the first time, please be gentle
+		local masterBagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+		masterBagConfig.IsMasterBag = true
+		local masterBag = ns.BagFrame:New(masterBagConfig)
+		masterBag.NumColumns = 10
+	end
+end
+
 function frame:PLAYER_ENTERING_WORLD()
 	CollectInventorySlots()
+	SavedVariablesManager.Init(OB_SV)
+	SavedVariablesManager.CreateRegisteredTable(SV_BAGS_STR)
+	SavedVariablesManager.Save()
 
-	local masterBag = ns.BagFrame:New(true)
-	masterBag.GridView:SetNumColumns(10)
+	SpawnBags()
+
+	--local masterBagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+	--masterBagConfig.IsMasterBag = true
+	--local masterBag = ns.BagFrame:New(masterBagConfig)
+	--masterBag.GridView:SetNumColumns(10)
 
 	local bagNum
 	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
 		self:BAG_UPDATE(bagNum)
 	end
 
-	masterBag:Update()
+	ns.MasterBag:Update()
+end
+
+function frame:PLAYER_LEAVING_WORLD()
+	SavedVariablesManager.Save()
 end
 
 function frame:BAG_UPDATE(bagId)
@@ -83,34 +121,3 @@ function frame:BAG_UPDATE(bagId)
 		end
 	end
 end
-
--- local CycleSort = ObeliskFrameworkManager:GetLibrary("ObeliskCycleSort", 0)
--- if not CycleSort then
--- 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCycleSort"))
--- end
-
--- local funcs = {
--- 	Compare = function(arr, val1, val2)
--- 		if arr[val1] < arr[val2] then
--- 			return -1
--- 		elseif arr[val1] > arr[val2] then
--- 			return 1
--- 		else
--- 			return 0
--- 		end
--- 	end,
--- 	Swap = function(arr, val1, val2)
--- 		local temp = arr[val1]
--- 		arr[val1] = arr[val2]
--- 		arr[val2] = temp
--- 	end
--- }
--- local t = {2, 23, 4, 2, 123, 2, 5,6,7,8,3,5,43,2,1,0,1,-1,123,2}
--- do
--- 	local s = ""
--- 	for k,v in pairs(t) do
--- 		s = s .. " " .. v
--- 	end
--- 	print(s)
--- end
--- CycleSort.Sort(t, funcs)

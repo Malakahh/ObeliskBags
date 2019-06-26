@@ -1,13 +1,16 @@
-## Interface: 80000
+## Interface: 80200
 ## Title: |cFFDDCF99Obelisk|r Bags
 ## Author: Malakahh
 ## Notes: A reimagined bag addon. Allows the creation of custom bags.
-## Version: r0
+## Version: a0
+
+## SavedVariables: OB_SV
 
 libs\ObeliskFramework\ObeliskInclude.xml
 bindings.lua
 ItemCache.lua
 BagSlot.lua
 BagFrame.lua
+BagFrame.Layout.lua
 BagSetupFrame.lua
 main.lua

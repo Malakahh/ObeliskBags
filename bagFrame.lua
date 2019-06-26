@@ -1,7 +1,7 @@
 local addonName, ns = ...
 local className = "BagFrame"
 
-ns.BagFrame = {}
+ns.BagFrame = ns.BagFrame or {}
 
 setmetatable(ns.BagFrame, {
 	__call = function (self, ...)
@@ -18,15 +18,25 @@ if not FrameworkClass then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskFrameworkClass"))
 end
 
-local libGridView = ObeliskFrameworkManager:GetLibrary("ObeliskGridView", 1)
-if not libGridView then
-	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskGridView"))
-end
-
 local CycleSort = ObeliskFrameworkManager:GetLibrary("ObeliskCycleSort", 0)
 if not CycleSort then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCycleSort"))
 end
+
+local SavedVariablesManager = ObeliskFrameworkManager:GetLibrary("ObeliskSavedVariablesManager", 0)
+if not SavedVariablesManager then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskSavedVariablesManager"))
+end
+
+---------------
+-- Constants --
+---------------
+local SV_BAGS_STR = "Bags"
+ns.BagFrame.DefaultConfigTable = {
+	IsMasterBag = false,
+	NumColumns = 1,
+	Slots = {},
+}
 
 -----------
 -- local --
@@ -95,7 +105,11 @@ local function DefragBags()
 
 	-- Spawn new bags
 	for _,v in pairs(oldBagData) do
-		ns.BagFrame.Spawn(v.numColumns, v.numSlots)
+		--ns.BagFrame.Spawn(v.numColumns, v.numSlots)
+		local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+		bagConfig.NumColumns = v.numColumns
+		bagConfig.Slots = v.numSlots
+		ns.BagFrame:New(bagConfig)
 	end
 
 	-- Restore items to virtual positions
@@ -118,16 +132,19 @@ end
 -- Class --
 -----------
 
-local shouldSetMetaTable = true
+function ns.BagFrame:New(configTable)
+	if configTable == nil then
+		error(ns.Debug:sprint(addonName .. className, "Attempted to create bag with configTable == nil"))
+		return
+	end
 
-function ns.BagFrame:New(isMasterBag)
-	if isMasterBag and ns.MasterBag then
+	if configTable.IsMasterBag and ns.MasterBag then
 		error(ns.Debug:sprint(addonName .. className, "Attempted to create multiple master bags"))
 		return
 	end
 
 	local name = addonName .. className
-	if isMasterBag then
+	if configTable.IsMasterBag then
 		name = name .. "Master"
 	end
 
@@ -138,71 +155,28 @@ function ns.BagFrame:New(isMasterBag)
 		parent = UIParent,
 		inheritsFrame = nil
 	})
-	instance.IsMasterBag = isMasterBag
+	instance.IsMasterBag = configTable.IsMasterBag
+	table.insert(createdBags, instance)
+	instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
 
-	---------
-	-- Layout
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	if not SV_bags then
+		error(ns.Debug:sprint(addonName .. className, "Failed SavedVariablesManager.GetRegisteredTable with key 'Bags'"))
+	end
+	SV_bags[instance.Id] = {}
+	SV_bags[instance.Id].Slots = {}
+	SV_bags[instance.Id].IsMasterBag = configTable.IsMasterBag
+	SavedVariablesManager.Save(SV_BAGS_STR)
 
-	instance.padding = 6
-	instance.spacing = 6
-	instance.btnHeight = 19
-
-	-- frame
-	instance:SetPoint("CENTER")
-	instance:SetBackdrop({
-		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tile = true,
-		tileSize = 16,
-		edgeSize = 16,
-		insets = { left = 4, right = 4, top = 4, bottom = 4}
-	})
-	instance:SetBackdropColor(0, 0, 0, 1)
-
-	-- Title
-	instance.Title = instance:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-	instance.Title:SetPoint("TOPLEFT", instance.padding, -instance.padding)
-
-	-- Btn Close
-	instance.BtnClose = CreateFrame("BUTTON", addonName .. "CloseButton", instance, "UIPanelCloseButtonNoScripts")
-	instance.BtnClose:SetPoint("TOPRIGHT", 0, 0)
-	instance.BtnClose:SetScript("OnClick", function(self, btn)
-		instance:Close()
-	end)
-
-	-- gridView
-	instance.GridView = libGridView(0, 0, "GridView", instance)
-	instance.GridView:SetCellSize(ns.CellSize, ns.CellSize)
-	instance.GridView:SetCellMargin(2,2)
-	instance.GridView:SetPoint("TOPRIGHT", instance.BtnClose, "BOTTOMRIGHT", -instance.padding, 0)
-
+	instance:LayoutInit()
 	instance.GridView:ToggleDebug()
 
-	-- frame movement
-	instance:SetMovable(true)
-	instance:SetClampedToScreen(true)
-
-	instance:SetScript("OnMouseDown", function(self, btn)
-		if btn == "LeftButton" and IsShiftKeyDown() then
-			self:ClearAllPoints()
-			self:StartMoving()
-		end
-	end)
-
-	instance:SetScript("OnMouseUp", function(self, btn)
-		self:StopMovingOrSizing()
-	end)
-
-	-- ConfigBtn
-	instance.BtnConfig = CreateFrame("BUTTON", addonName .. "ConfigButton", instance, "UIPanelButtonTemplate")
-	instance.BtnConfig:SetSize(25, instance.btnHeight)
-	instance.BtnConfig.icon = instance.BtnConfig:CreateTexture(nil, "ARTWORK")
-	instance.BtnConfig.icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
-	instance.BtnConfig.icon:SetSize(12, 12)
-	instance.BtnConfig.icon:SetPoint("TOPLEFT", instance.BtnConfig, "TOPLEFT", 6, -4)
+	if configTable.NumColumns then
+		instance.NumColumns = configTable.NumColumns
+	end
 
 	-- Master bag dependant layout
-	if isMasterBag then
+	if instance.IsMasterBag then
 		-- Manually add to gridview to skip adding to available pool again
 		for i = 1, ns.InventorySlotPool:Count() do
 			local slot = ns.InventorySlotPool.items[i]
@@ -210,116 +184,94 @@ function ns.BagFrame:New(isMasterBag)
 			slot:SetOwner(instance)
 		end
 
-		instance.BtnNewBag = CreateFrame("BUTTON", addonName .. "NewBagButton", instance, "UIPanelButtonTemplate")
-		instance.BtnNewBag:SetSize(100, instance.btnHeight)
-		instance.BtnNewBag:SetPoint("BOTTOMLEFT", instance, "BOTTOMLEFT", instance.padding, instance.padding)
-		instance.BtnNewBag:SetText("New Bag")
-
-		instance.BtnNewBag:SetScript("OnClick", function(btn)
-			ns.BagSetupFrame:Show()
-		end)
-
-		instance.BtnConfig:SetPoint("LEFT", instance.BtnNewBag, "RIGHT", instance.spacing, 0)
-
-		instance.BtnDefrag = CreateFrame("BUTTON", addonName .. "DefragButton", instance, "UIPanelButtonTemplate")
-		instance.BtnDefrag:SetSize(100, instance.btnHeight)
-		instance.BtnDefrag:SetText("Defrag")
-		instance.BtnDefrag:SetPoint("LEFT", instance.BtnConfig, "RIGHT", instance.spacing, 0)
-		instance.BtnDefrag:SetScript("OnClick", function(self, btn)
-			DefragBags()
-		end)
-
-		instance.MoneyFrame = CreateFrame("FRAME", addonName .. "MoneyFrame", instance, "SmallMoneyFrameTemplate")
-		instance.MoneyFrame:SetPoint("BOTTOMRIGHT", instance.padding, instance.padding * 1.5)
-
 		ns.MasterBag = instance
-	else
-		instance.BtnDelete = CreateFrame("BUTTON", addonName .. "DeleteButton", instance, "UIPanelButtonTemplate")
-		instance.BtnDelete:SetSize(100, instance.btnHeight)
-		instance.BtnDelete:SetPoint("BOTTOMLEFT", instance, "BOTTOMLEFT", instance.padding, instance.padding)
-		instance.BtnDelete:SetText("Delete bag")
-		instance.BtnDelete:SetScript("OnClick", function(self, btn)
-			instance:DeleteBag()
-		end)
+	elseif configTable.Slots then
+		if type(configTable.Slots) == "table" and #configTable.Slots > 0 then
+			local compFunc = function(key, value, phys) return value:GetPhysicalIdentifier() == phys end
+			for k,v in pairs(configTable.Slots) do
+				local idx = ns.Util.Table.IndexWhere(ns.InventorySlotPool.items, compFunc, v)
+				local slot = table.remove(ns.InventorySlotPool.items, idx)
+				ns.MasterBag:RemoveSlot(slot)
+				instance:AddSlot(slot)
+			end
+		elseif type(configTable.Slots) == "number" then
+			-- get slots
+			local slots = {}
+			for i = 1, configTable.Slots, 1 do
+				local slot = ns.InventorySlotPool:Pop()
+				table.insert(slots, slot)
+			end
 
-		instance.BtnConfig:SetPoint("LEFT", instance.BtnDelete, "RIGHT", instance.spacing, 0)
+			table.sort(slots, function (a, b)
+				return a:GetPhysicalIdentifier() < b:GetPhysicalIdentifier()
+			end)
+
+			for i = 1, #slots do
+				ns.MasterBag:RemoveSlot(slots[i])
+			 	instance:AddSlot(slots[i])
+			end
+		end
+
+		-- Handle size of bag
+		local gridWidth, gridHeight = instance.GridView:GetCalculatedGridSize()
+		instance:SetSize(gridWidth, gridHeight)
+
+		instance:Update()
+		ns.MasterBag:Update()
 	end
-
-	table.insert(createdBags, instance)
-	instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
-
-	instance.Title:SetText("Title - " .. instance.Id)
 
 	return instance
 end
 
-function ns.BagFrame.Spawn(numColumns, numSlots)
-	local bag = ns.BagFrame:New(false)
-	bag.GridView:SetNumColumns(numColumns)
-
-	-- get slots
-	local slots = {}
-	for i = 1, numSlots, 1 do
-		local slot = ns.InventorySlotPool:Pop()
-		table.insert(slots, slot)
+function ns.BagFrame.OnMouseDown(self, btn)
+	if btn == "LeftButton" and IsShiftKeyDown() then
+		self:ClearAllPoints()
+		self:StartMoving()
 	end
-
-	table.sort(slots, function (a, b)
-		return a:GetPhysicalIdentifier() < b:GetPhysicalIdentifier()
-	end)
-
-	for i = 1, #slots do
-		ns.MasterBag:RemoveSlot(slots[i])
-	 	bag:AddSlot(slots[i])
-	end
-
-	-- Handle size of bag
-	local gridWidth, gridHeight = bag.GridView:GetCalculatedGridSize()
-	bag:SetSize(gridWidth, gridHeight)
-	bag:Update()
-
-	ns.MasterBag:Update()
 end
 
-function ns.BagFrame:Serialize()
-	local data = {}
-	data.slots = {}
-	data.numColumns = self.GridView:GetNumColumns()
-
-	for _,v in pairs(self.GridView.items) do
-		table.insert(data.slots, v:GetPhysicalIdentifier())
-	end
-
-	return data
+function ns.BagFrame.OnMouseUp(self, btn)
+	self:StopMovingOrSizing()
 end
 
-function ns.BagFrame:Deserialize(data)
-	local bag = ns.BagFrame:New(false)
-	bag.GridView:SetNumColumns(data.numColumns)
+function ns.BagFrame.BtnClose_OnClick(self, btn)
+	self:GetParent():Close()
+end
 
-	local i = 1, #data.slots do
-		local idx = ns.Util.Table.IndexWhere(ns.InventorySlotPool.items, function(k, v, ...)
-			return data.slots[i] == v
-		end)
+function ns.BagFrame.BtnDelete_OnClick(self, btn)
+	self:GetParent():DeleteBag()
+end
 
-		local slot = ns.InventorySlotPool.items[idx]
-		ns.Util.Table.RemoveByVal(ns.InventorySlotPool.items, slot)
-		ns.MasterBag:RemoveSlot(slot)
-		bag:AddSlot(slot)
-	end
+function ns.BagFrame.BtnNew_OnClick(self, btn)
+	ns.BagSetupFrame:Show()
+end
 
-	-- Handle size of bag
-	local gridWidth, gridHeight = bag.GridView:GetCalculatedGridSize()
-	bag:SetSize(gridWidth, gridHeight)
-	bag:Update()
+function ns.BagFrame.BtnDefrag_OnClick(self, btn)
+	DefragBags()
+end
 
-	ns.MasterBag:Update()
+ns.BagFrame[FrameworkClass.PROPERTY_GET_PREFIX .. "NumColumns"] = function(self, key)
+	return self.GridView:GetNumColumns()
+end
+
+ns.BagFrame[FrameworkClass.PROPERTY_SET_PREFIX .. "NumColumns"] = function(self, key, value)
+	self.GridView:SetNumColumns(value)
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	SV_bags[self.Id].NumColumns = value
+	SavedVariablesManager.Save(SV_BAGS_STR)
+
+	return value
 end
 
 function ns.BagFrame:DeleteBag()
 	self:MergeBag(ns.MasterBag)
 	ns.Util.Table.RemoveByVal(createdBags, self)
 	ns.MasterBag:Update()
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	SV_bags[self.Id] = nil
+	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
 function ns.BagFrame:MergeBag(target)
@@ -345,6 +297,15 @@ function ns.BagFrame:AddSlot(slot)
 	self.GridView:AddItem(slot)
 	slot:SetOwner(self)
 
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+
+	if type(SV_bags[self.Id].Slots) == "number" then
+		SV_bags[self.Id].Slots = {}
+	end
+
+	table.insert(SV_bags[self.Id].Slots, slot:GetPhysicalIdentifier())
+	SavedVariablesManager.Save(SV_BAGS_STR)
+
 	if self.IsMasterBag then
 		ns.InventorySlotPool:Push(slot)
 	end
@@ -352,6 +313,10 @@ end
 
 function ns.BagFrame:RemoveSlot(slot)
 	self.GridView:RemoveItem(slot)
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	ns.Util.Table.RemoveByVal(SV_bags[self.Id].Slots, slot:GetPhysicalIdentifier())
+	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
 function ns.BagFrame:Update()
