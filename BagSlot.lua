@@ -175,4 +175,5 @@ end
 
 function ns.BagSlot:GetDebugText()
 	return self:GetPhysicalIdentifier()
+	--return self:GetVirtualIdentifier()
 end

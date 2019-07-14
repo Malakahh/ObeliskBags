@@ -56,12 +56,24 @@ local cycleSortFuncs = {
 		end
 	end,
 	Swap = function(arr, val1, val2)
+
+		--print("Swap: val1: " .. val1 .. "->" .. arr[val1].phys .. " val2: " .. val2 .. "->" .. arr[val2].phys)
 		local temp = arr[val1].virt
 		arr[val1].virt = arr[val2].virt
 		arr[val2].virt = temp
 
 		local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(arr[val1].phys)
 		local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(arr[val2].phys)
+
+		-- Wait for server...
+		repeat
+			local _, _, locked1 = GetContainerItemInfo(bagId1, slotId1)
+	        local _, _, locked2 = GetContainerItemInfo(bagId2, slotId2)
+
+	        if locked1 or locked2 then
+	            coroutine.yield()
+	        end
+	    until not (locked1 or locked2)
 
 		PickupContainerItem(bagId1, slotId1)
 		PickupContainerItem(bagId2, slotId2)
@@ -78,7 +90,6 @@ local function DefragBags()
 	local oldBagData = {}
 	local oldSlots = {}
 	for i = 1, #createdBags do
-		createdBags[i].Id = i
 		local gridView = createdBags[i].GridView
 
 		for k = 1, #gridView.items do
@@ -105,7 +116,6 @@ local function DefragBags()
 
 	-- Spawn new bags
 	for _,v in pairs(oldBagData) do
-		--ns.BagFrame.Spawn(v.numColumns, v.numSlots)
 		local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
 		bagConfig.NumColumns = v.numColumns
 		bagConfig.Slots = v.numSlots
@@ -118,13 +128,33 @@ local function DefragBags()
 		local gridView = createdBags[i].GridView
 
 		for n = 1, #gridView.items do
+			local nPhys = gridView.items[n]:GetPhysicalIdentifier()
 			local idx = ns.Util.Table.IndexWhere(oldSlots, function(k,v,...)
-				return v.phys == gridView.items[n]:GetPhysicalIdentifier()
+				return v.phys == nPhys
 			end)
 
 			newSlots[#newSlots + 1] = oldSlots[idx]
 		end
 	end
+
+	-- print("Old")
+	-- do
+	-- 	local s = ""
+	-- 	for k,v in pairs(oldSlots) do
+	-- 		s = s .. " " .. k .. ":".. v.virt
+	-- 	end
+	-- 	print(s)
+	-- end
+
+	-- print("New")
+	-- do
+	-- 	local s = ""
+	-- 	for k,v in pairs(newSlots) do
+	-- 		s = s .. " " .. k .. ":".. v.virt
+	-- 	end
+	-- 	print(s)
+	-- end
+
 	CycleSort.Sort(newSlots, cycleSortFuncs)
 end
 
@@ -224,7 +254,7 @@ function ns.BagFrame:New(configTable)
 end
 
 function ns.BagFrame.OnMouseDown(self, btn)
-	if btn == "LeftButton" and IsShiftKeyDown() then
+	if btn == "LeftButton" then
 		self:ClearAllPoints()
 		self:StartMoving()
 	end
