@@ -24,7 +24,7 @@ local SV_BAGS_STR = "Bags"
 
 local frame = CreateFrame("FRAME")
 frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("BAG_UPDATE")
 
 -- Make table of all inventory slots
@@ -69,8 +69,8 @@ local function SpawnBags()
 		local masterBagIdx = ns.Util.Table.IndexWhere(workingSet, function(k, v, ...) return v.IsMasterBag end)
 
 		-- Start with master bag
-		-- ns.BagFrame:New(workingSet[masterBagIdx])
-		-- workingSet[masterBagIdx] = nil
+		ns.BagFrame:New(workingSet[masterBagIdx])
+		workingSet[masterBagIdx] = nil
 
 		-- Remaining bags
 		for k,v in pairs(workingSet) do
@@ -84,18 +84,13 @@ local function SpawnBags()
 	end
 end
 
-function frame:PLAYER_ENTERING_WORLD()
+function frame:PLAYER_LOGIN()
 	CollectInventorySlots()
 	SavedVariablesManager.Init(OB_SV)
 	SavedVariablesManager.CreateRegisteredTable(SV_BAGS_STR)
 	SavedVariablesManager.Save()
 
 	SpawnBags()
-
-	--local masterBagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
-	--masterBagConfig.IsMasterBag = true
-	--local masterBag = ns.BagFrame:New(masterBagConfig)
-	--masterBag.GridView:SetNumColumns(10)
 
 	local bagNum
 	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
@@ -105,9 +100,9 @@ function frame:PLAYER_ENTERING_WORLD()
 	ns.MasterBag:Update()
 end
 
-function frame:PLAYER_LEAVING_WORLD()
-	SavedVariablesManager.Save()
-end
+-- function frame:PLAYER_LEAVING_WORLD()
+-- 	SavedVariablesManager.Save()
+-- end
 
 function frame:BAG_UPDATE(bagId)
 	local maxNumSlots = GetContainerNumSlots(bagId)

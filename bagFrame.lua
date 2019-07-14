@@ -36,6 +36,13 @@ ns.BagFrame.DefaultConfigTable = {
 	IsMasterBag = false,
 	NumColumns = 1,
 	Slots = {},
+	Position = {
+		"CENTER",
+		UIParent,
+		"CENTER",
+		0,
+		0,
+	},
 }
 
 -----------
@@ -146,15 +153,6 @@ local function DefragBags()
 	-- 	print(s)
 	-- end
 
-	-- print("New")
-	-- do
-	-- 	local s = ""
-	-- 	for k,v in pairs(newSlots) do
-	-- 		s = s .. " " .. k .. ":".. v.virt
-	-- 	end
-	-- 	print(s)
-	-- end
-
 	CycleSort.Sort(newSlots, cycleSortFuncs)
 end
 
@@ -203,6 +201,16 @@ function ns.BagFrame:New(configTable)
 
 	if configTable.NumColumns then
 		instance.NumColumns = configTable.NumColumns
+	end
+
+	if configTable.Position then
+		local pos = configTable.Position
+		pos[2] = UIParent
+		instance:ClearAllPoints()
+		instance:SetPoint(unpack(pos))
+
+		SV_bags[instance.Id].Position = pos
+		SavedVariablesManager.Save(SV_BAGS_STR)
 	end
 
 	-- Master bag dependant layout
@@ -262,6 +270,10 @@ end
 
 function ns.BagFrame.OnMouseUp(self, btn)
 	self:StopMovingOrSizing()
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	SV_bags[self.Id].Position = { self:GetPoint() }
+	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
 function ns.BagFrame.BtnClose_OnClick(self, btn)
