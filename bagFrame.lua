@@ -49,6 +49,7 @@ ns.BagFrame.DefaultConfigTable = {
 -- local --
 -----------
 
+
 local isShown = true
 local createdBags = {}
 
@@ -64,13 +65,22 @@ local cycleSortFuncs = {
 	end,
 	Swap = function(arr, val1, val2)
 
-		--print("Swap: val1: " .. val1 .. "->" .. arr[val1].phys .. " val2: " .. val2 .. "->" .. arr[val2].phys)
+
+		print("Swap: val1: " .. val1 .. "->" .. arr[val1].phys .. " val2: " .. val2 .. "->" .. arr[val2].phys)
 		local temp = arr[val1].virt
 		arr[val1].virt = arr[val2].virt
 		arr[val2].virt = temp
 
+		-- temp = arr[val1].phys
+		-- arr[val1].phys = arr[val2].phys
+		-- arr[val2].phys = temp
+
+
 		local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(arr[val1].phys)
 		local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(arr[val2].phys)
+
+		
+		local attempts = 0
 
 		-- Wait for server...
 		repeat
@@ -80,7 +90,11 @@ local cycleSortFuncs = {
 	        if locked1 or locked2 then
 	            coroutine.yield()
 	        end
+
+	        attempts = attempts + 1
 	    until not (locked1 or locked2)
+
+	    print("Swapping: attempts: " .. attempts)
 
 		PickupContainerItem(bagId1, slotId1)
 		PickupContainerItem(bagId2, slotId2)
@@ -96,14 +110,17 @@ local function DefragBags()
 	-- Gather old bag data
 	local oldBagData = {}
 	local oldSlots = {}
+	local cnt = 1
 	for i = 1, #createdBags do
 		local gridView = createdBags[i].GridView
 
 		for k = 1, #gridView.items do
 			oldSlots[#oldSlots + 1] = {
 				phys = gridView.items[k]:GetPhysicalIdentifier(),
-				virt = gridView.items[k]:GetVirtualIdentifier()
+				--virt = gridView.items[k]:GetVirtualIdentifier()
+				virt = cnt
 			}
+			cnt = cnt + 1
 		end
 
 		if not createdBags[i].IsMasterBag then
@@ -129,7 +146,7 @@ local function DefragBags()
 		ns.BagFrame:New(bagConfig)
 	end
 
-	-- Restore items to virtual positions
+	-- Create new list with shuffled virtual order
 	local newSlots = {}
 	for i = 1, #createdBags do
 		local gridView = createdBags[i].GridView
@@ -144,17 +161,87 @@ local function DefragBags()
 		end
 	end
 
-	-- print("Old")
+	-- This actually calls a selection sort for now, for simplicity. I was worried my cyclesort implementation was wrong
+	CycleSort.Sort(newSlots, cycleSortFuncs)
+
+	-- print("New")
 	-- do
 	-- 	local s = ""
-	-- 	for k,v in pairs(oldSlots) do
-	-- 		s = s .. " " .. k .. ":".. v.virt
+	-- 	for k,v in pairs(newSlots) do
+	-- 		s = s .. " " .. k .. ":".. v.virt .. ":" .. v.phys
 	-- 	end
 	-- 	print(s)
 	-- end
 
-	CycleSort.Sort(newSlots, cycleSortFuncs)
+
+
+
+	-- for i = 1, #newSlots - 1 do
+	-- 	if i ~= newSlots[i].virt then
+	-- 		print("i: " .. i .. " virt:" .. newSlots[i].virt)
+	-- 		for k = i + 1, #newSlots do
+	-- 			if i == newSlots[k].virt then
+					
+
+	-- 				local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(newSlots[k].phys)
+	-- 				local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(newSlots[i].phys)
+
+					
+	-- 				local attempts = 0
+
+	-- 				-- Wait for server...
+	-- 				repeat
+	-- 					local _, _, locked1 = GetContainerItemInfo(bagId1, slotId1)
+	-- 			        local _, _, locked2 = GetContainerItemInfo(bagId2, slotId2)
+
+	-- 			        if locked1 or locked2 then
+	-- 			            coroutine.yield()
+	-- 			        end
+
+	-- 			        attempts = attempts + 1
+	-- 			    until not (locked1 or locked2)
+
+	-- 			    print("Swapping: attempts: " .. attempts)
+
+	-- 				PickupContainerItem(bagId1, slotId1)
+	-- 				PickupContainerItem(bagId2, slotId2)
+
+	-- 				local temp = newSlots[k].virt
+	-- 				newSlots[k].virt = newSlots[i].virt
+	-- 				newSlots[i].virt = temp
+
+	-- 				coroutine.yield()
+	-- 			end
+	-- 		end
+	-- 	end
+	-- end
+
+	-- print("Finish")
+	-- do
+	-- 	local s = ""
+	-- 	for k,v in pairs(newSlots) do
+	-- 		s = s .. " " .. k .. ":".. v.virt .. ":" .. v.phys
+	-- 	end
+	-- 	print(s)
+	-- end
 end
+
+local cor
+local frame = CreateFrame("FRAME")
+--frame:RegisterEvent("ITEM_LOCK_CHANGED")
+function frame:OnUpdate(elapsed)
+	local alive = coroutine.resume(cor)
+	if not alive then
+		self:SetScript("OnUpdate", nil)
+	end
+end
+
+local function Start()
+	cor = coroutine.create(DefragBags)
+	frame:SetScript("OnUpdate", frame.OnUpdate)
+end
+
+
 
 -----------
 -- Class --
@@ -289,7 +376,8 @@ function ns.BagFrame.BtnNew_OnClick(self, btn)
 end
 
 function ns.BagFrame.BtnDefrag_OnClick(self, btn)
-	DefragBags()
+	--DefragBags()
+	Start()
 end
 
 ns.BagFrame[FrameworkClass.PROPERTY_GET_PREFIX .. "NumColumns"] = function(self, key)
