@@ -242,6 +242,23 @@ local cycleSortFuncs = {
 -- end
 
 local function DefragBags()
+	local swapBag, swapSlot = nil, nil
+
+	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+		local numFreeSlots, bagType = GetContainerNumFreeSlots(bagNum)
+
+		if numFreeSlots > 0 and bagType == 0 then
+			swapBag = bagNum
+			swapSlot = GetContainerFreeSlots(bagNum)[1]
+			break
+		end
+	end
+
+	if swapBag == nil or swapSlot == nil then
+		print("Unable to defrag. Must have at least 1 available slot in a regular bag.")
+		return
+	end
+
 	ClearCursor()
 
 	-- Reorder createdBags, so that we can get proper Ids
@@ -275,14 +292,6 @@ local function DefragBags()
 			if not createdBags[i].IsMasterBag then
 				oldBagData[i] = createdBags[i]:GetConfigTable()
 				oldBagData[i].Slots = #oldBagData[i].Slots
-
-
-
-				-- oldBagData[i] = {
-				-- 	numColumns = gridView:GetNumColumns(),
-				-- 	numSlots = gridView:ItemCount(),
-				-- 	position = createdBags[i]:GetPosition(),
-				-- }
 			end
 		end
 	end
@@ -296,83 +305,147 @@ local function DefragBags()
 
 	-- Spawn new bags
 	for _,v in pairs(oldBagData) do
-		-- local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
-
-		-- bagConfig.NumColumns = v.numColumns
-		-- bagConfig.Slots = v.numSlots
-		-- bagConfig.Position = v.position
-
 		ns.BagFrame:New(v)
 	end
 
-	-- TODO Handle items that stack..
 	-- Rearrange items
 	local locked = {}
-	for k,v in pairs(virtItemSlots) do
+	for _,v in pairs(virtItemSlots) do
 		local fromBag, fromSlot
 		local fromFound = false
 
-		-- Iterate through bags to find correct items
+		-- Check if item is already in place, in which case we can skip it
+		local skip = false
 		for i = 1, #createdBags do
 			local gridView = createdBags[i].GridView
 
 			for n = 1, #gridView.items do
-				local physId = gridView.items[n]:GetPhysicalIdentifier()
-				if not locked[physId] then
-					local b, s = ns.BagSlot.DecodeSlotIdentifier(physId)
-					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b, s)
+				if gridView.items[n]:GetVirtualIdentifier() == v.virt then
+					local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
+					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
 
-					if itemId == v.itemId and itemCount == v.itemCount then
-						fromBag = b
-						fromSlot = s
-						fromFound = true
+					if itemId == v.itemId and itemCount	== v.itemCount then
+						skip = true
+						locked[ns.BagSlot.EncodeSlotIdentifier(b, s)] = true
 						break
 					end
 				end
 			end
 
-			if fromFound then
+			if skip then
 				break
 			end
 		end
 
-		if fromFound then
-			local toBag, toSlot
-			local toFound
+		if not skip then
 
+			-- Iterate through bags to find correct items
 			for i = 1, #createdBags do
 				local gridView = createdBags[i].GridView
 
 				for n = 1, #gridView.items do
-					if gridView.items[n]:GetVirtualIdentifier() == v.virt then
-						toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
-						toFound = true
-						break
+					local physId = gridView.items[n]:GetPhysicalIdentifier()
+					if not locked[physId] then
+						local b, s = ns.BagSlot.DecodeSlotIdentifier(physId)
+						local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b, s)
+
+						if itemId == v.itemId and itemCount == v.itemCount then
+							fromBag = b
+							fromSlot = s
+							fromFound = true
+							break
+						end
 					end
 				end
 
-				if toFound then
+				if fromFound then
 					break
 				end
 			end
 
-			if toFound then
+			if fromFound then
+				local toBag, toSlot
+				local toFound
 
-				-- Wait for server...
-				repeat
-					local _, _, locked1 = GetContainerItemInfo(fromBag, fromSlot)
-			        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+				-- Find "to"
+				for i = 1, #createdBags do
+					local gridView = createdBags[i].GridView
 
-			        if locked1 or locked2 then
-			            coroutine.yield()
-			        end
-			    until not (locked1 or locked2)
+					for n = 1, #gridView.items do
+						if gridView.items[n]:GetVirtualIdentifier() == v.virt then
+							toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
+							toFound = true
+							break
+						end
+					end
 
-				PickupContainerItem(fromBag, fromSlot)
- 				PickupContainerItem(toBag, toSlot)
- 				locked[ns.BagSlot.EncodeSlotIdentifier(toBag, toSlot)] = true
+					if toFound then
+						break
+					end
+				end
 
- 				coroutine.yield()
+				-- Swap
+				if toFound and not (fromBag == toBag and fromSlot == toSlot) then
+					-- TODO: Could skip swap slot if "to" slot is empty
+					-- TODO: Could skip swap slot if item in "to" is of different itemID than "from"
+					-- TODO: Could skip swap slot if itemID in "to" doesn't stack with "from", even if the itemID is equal
+
+					-- Wait for lock...
+					repeat
+						local _, _, locked1 = GetContainerItemInfo(fromBag, fromSlot)
+				        local _, _, locked2 = GetContainerItemInfo(swapBag, swapSlot)
+
+				        if locked1 or locked2 then
+				            coroutine.yield()
+				        end
+				    until not (locked1 or locked2)
+
+					PickupContainerItem(fromBag, fromSlot)
+					PickupContainerItem(swapBag, swapSlot)
+
+					coroutine.yield()
+
+					-- Wait for lock...
+					repeat
+						local _, _, locked1 = GetContainerItemInfo(toBag, toSlot)
+				        local _, _, locked2 = GetContainerItemInfo(fromBag, fromSlot)
+
+				        if locked1 or locked2 then
+				            coroutine.yield()
+				        end
+				    until not (locked1 or locked2)
+
+	 				PickupContainerItem(toBag, toSlot)
+	 				PickupContainerItem(fromBag, fromSlot)
+
+	 				coroutine.yield()
+
+	 				-- Wait for lock...
+	 				repeat
+						local _, _, locked1 = GetContainerItemInfo(swapBag, swapSlot)
+				        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+
+				        if locked1 or locked2 then
+				            coroutine.yield()
+				        end
+				    until not (locked1 or locked2)
+
+	 				PickupContainerItem(swapBag, swapSlot)
+	 				PickupContainerItem(toBag, toSlot)
+
+	 				repeat
+						local _, _, locked1 = GetContainerItemInfo(swapBag, swapSlot)
+				        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+
+				        if locked1 or locked2 then
+				            coroutine.yield()
+				        end
+				    until not (locked1 or locked2)
+
+	 				locked[ns.BagSlot.EncodeSlotIdentifier(toBag, toSlot)] = true
+
+	 				coroutine.yield()
+				end
 			end
 		end
 	end
