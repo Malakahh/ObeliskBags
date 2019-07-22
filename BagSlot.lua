@@ -143,7 +143,7 @@ function ns.BagSlot.DecodeSlotIdentifier(slotIdentifier)
 	local slotId = string.sub(slotIdentifier, -3)
 	local bagId = string.sub(slotIdentifier, 1, -4)
 
-	return bagId, slotId
+	return tonumber(bagId), tonumber(slotId)
 end
 
 function ns.BagSlot:GetPhysicalIdentifier()

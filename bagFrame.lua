@@ -101,68 +101,68 @@ local cycleSortFuncs = {
 	end
 }
 
-local function DefragBags()
-	ClearCursor()
+-- local function DefragBags()
+-- 	ClearCursor()
 
-	-- Reorder createdBags, so that we can get proper Ids
-	createdBags = ns.Util.Table.Arrange(createdBags)
+-- 	-- Reorder createdBags, so that we can get proper Ids
+-- 	createdBags = ns.Util.Table.Arrange(createdBags)
 
-	-- Gather old bag data
-	local oldBagData = {}
-	local oldSlots = {}
-	local cnt = 1
-	for i = 1, #createdBags do
-		local gridView = createdBags[i].GridView
+-- 	-- Gather old bag data
+-- 	local oldBagData = {}
+-- 	local oldSlots = {}
+-- 	local cnt = 1
+-- 	for i = 1, #createdBags do
+-- 		local gridView = createdBags[i].GridView
 
-		for k = 1, #gridView.items do
-			oldSlots[#oldSlots + 1] = {
-				phys = gridView.items[k]:GetPhysicalIdentifier(),
-				--virt = gridView.items[k]:GetVirtualIdentifier()
-				virt = cnt
-			}
-			cnt = cnt + 1
-		end
+-- 		for k = 1, #gridView.items do
+-- 			oldSlots[#oldSlots + 1] = {
+-- 				phys = gridView.items[k]:GetPhysicalIdentifier(),
+-- 				--virt = gridView.items[k]:GetVirtualIdentifier()
+-- 				virt = cnt
+-- 			}
+-- 			cnt = cnt + 1
+-- 		end
 
-		if not createdBags[i].IsMasterBag then
-			oldBagData[i] = {
-				numColumns = gridView:GetNumColumns(),
-				numSlots = gridView:ItemCount(),
-			}
-		end
-	end
+-- 		if not createdBags[i].IsMasterBag then
+-- 			oldBagData[i] = {
+-- 				numColumns = gridView:GetNumColumns(),
+-- 				numSlots = gridView:ItemCount(),
+-- 			}
+-- 		end
+-- 	end
 
-	-- Delete old bags
-	for i = #createdBags, 1, -1 do
-		if not createdBags[i].IsMasterBag then
-			createdBags[i]:DeleteBag()
-		end
-	end
+-- 	-- Delete old bags
+-- 	for i = #createdBags, 1, -1 do
+-- 		if not createdBags[i].IsMasterBag then
+-- 			createdBags[i]:DeleteBag()
+-- 		end
+-- 	end
 
-	-- Spawn new bags
-	for _,v in pairs(oldBagData) do
-		local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
-		bagConfig.NumColumns = v.numColumns
-		bagConfig.Slots = v.numSlots
-		ns.BagFrame:New(bagConfig)
-	end
+-- 	-- Spawn new bags
+-- 	for _,v in pairs(oldBagData) do
+-- 		local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+-- 		bagConfig.NumColumns = v.numColumns
+-- 		bagConfig.Slots = v.numSlots
+-- 		ns.BagFrame:New(bagConfig)
+-- 	end
 
-	-- Create new list with shuffled virtual order
-	local newSlots = {}
-	for i = 1, #createdBags do
-		local gridView = createdBags[i].GridView
+-- 	-- Create new list with shuffled virtual order
+-- 	local newSlots = {}
+-- 	for i = 1, #createdBags do
+-- 		local gridView = createdBags[i].GridView
 
-		for n = 1, #gridView.items do
-			local nPhys = gridView.items[n]:GetPhysicalIdentifier()
-			local idx = ns.Util.Table.IndexWhere(oldSlots, function(k,v,...)
-				return v.phys == nPhys
-			end)
+-- 		for n = 1, #gridView.items do
+-- 			local nPhys = gridView.items[n]:GetPhysicalIdentifier()
+-- 			local idx = ns.Util.Table.IndexWhere(oldSlots, function(k,v,...)
+-- 				return v.phys == nPhys
+-- 			end)
 
-			newSlots[#newSlots + 1] = oldSlots[idx]
-		end
-	end
+-- 			newSlots[#newSlots + 1] = oldSlots[idx]
+-- 		end
+-- 	end
 
-	-- This actually calls a selection sort for now, for simplicity. I was worried my cyclesort implementation was wrong
-	CycleSort.Sort(newSlots, cycleSortFuncs)
+-- 	-- This actually calls a selection sort for now, for simplicity. I was worried my cyclesort implementation was wrong
+-- 	CycleSort.Sort(newSlots, cycleSortFuncs)
 
 	-- print("New")
 	-- do
@@ -224,11 +224,162 @@ local function DefragBags()
 	-- 	end
 	-- 	print(s)
 	-- end
+-- end
+
+-- local cor
+-- local frame = CreateFrame("FRAME")
+-- --frame:RegisterEvent("ITEM_LOCK_CHANGED")
+-- function frame:OnUpdate(elapsed)
+-- 	local alive = coroutine.resume(cor)
+-- 	if not alive then
+-- 		self:SetScript("OnUpdate", nil)
+-- 	end
+-- end
+
+-- local function Start()
+-- 	cor = coroutine.create(DefragBags)
+-- 	frame:SetScript("OnUpdate", frame.OnUpdate)
+-- end
+
+local function DefragBags()
+	ClearCursor()
+
+	-- Reorder createdBags, so that we can get proper Ids
+	createdBags = ns.Util.Table.Arrange(createdBags)
+
+	local virtItemSlots = {}
+
+	-- Collect item information
+	for i = 1, #createdBags do
+		local gridView = createdBags[i].GridView
+		for k = 1, #gridView.items do
+			local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[k]:GetPhysicalIdentifier())
+			local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
+
+			if itemId ~= nil then
+				table.insert(virtItemSlots, {
+					itemCount = itemCount,
+					itemId = itemId,
+					virt = ns.BagSlot.EncodeSlotIdentifier(i, k)
+				})
+			end
+		end
+	end
+
+	-- Gather old bag data
+	local oldBagData = {}
+	for i = 1, #createdBags do
+		for i = 1, #createdBags do
+			local gridView = createdBags[i].GridView
+
+			if not createdBags[i].IsMasterBag then
+				oldBagData[i] = createdBags[i]:GetConfigTable()
+				oldBagData[i].Slots = #oldBagData[i].Slots
+
+
+
+				-- oldBagData[i] = {
+				-- 	numColumns = gridView:GetNumColumns(),
+				-- 	numSlots = gridView:ItemCount(),
+				-- 	position = createdBags[i]:GetPosition(),
+				-- }
+			end
+		end
+	end
+
+	-- Delete old bags
+	for i = #createdBags, 1, -1 do
+		if not createdBags[i].IsMasterBag then
+			createdBags[i]:DeleteBag()
+		end
+	end
+
+	-- Spawn new bags
+	for _,v in pairs(oldBagData) do
+		-- local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+
+		-- bagConfig.NumColumns = v.numColumns
+		-- bagConfig.Slots = v.numSlots
+		-- bagConfig.Position = v.position
+
+		ns.BagFrame:New(v)
+	end
+
+	-- TODO Handle items that stack..
+	-- Rearrange items
+	local locked = {}
+	for k,v in pairs(virtItemSlots) do
+		local fromBag, fromSlot
+		local fromFound = false
+
+		-- Iterate through bags to find correct items
+		for i = 1, #createdBags do
+			local gridView = createdBags[i].GridView
+
+			for n = 1, #gridView.items do
+				local physId = gridView.items[n]:GetPhysicalIdentifier()
+				if not locked[physId] then
+					local b, s = ns.BagSlot.DecodeSlotIdentifier(physId)
+					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b, s)
+
+					if itemId == v.itemId and itemCount == v.itemCount then
+						fromBag = b
+						fromSlot = s
+						fromFound = true
+						break
+					end
+				end
+			end
+
+			if fromFound then
+				break
+			end
+		end
+
+		if fromFound then
+			local toBag, toSlot
+			local toFound
+
+			for i = 1, #createdBags do
+				local gridView = createdBags[i].GridView
+
+				for n = 1, #gridView.items do
+					if gridView.items[n]:GetVirtualIdentifier() == v.virt then
+						toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
+						toFound = true
+						break
+					end
+				end
+
+				if toFound then
+					break
+				end
+			end
+
+			if toFound then
+
+				-- Wait for server...
+				repeat
+					local _, _, locked1 = GetContainerItemInfo(fromBag, fromSlot)
+			        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+
+			        if locked1 or locked2 then
+			            coroutine.yield()
+			        end
+			    until not (locked1 or locked2)
+
+				PickupContainerItem(fromBag, fromSlot)
+ 				PickupContainerItem(toBag, toSlot)
+ 				locked[ns.BagSlot.EncodeSlotIdentifier(toBag, toSlot)] = true
+
+ 				coroutine.yield()
+			end
+		end
+	end
 end
 
 local cor
 local frame = CreateFrame("FRAME")
---frame:RegisterEvent("ITEM_LOCK_CHANGED")
 function frame:OnUpdate(elapsed)
 	local alive = coroutine.resume(cor)
 	if not alive then
@@ -240,8 +391,6 @@ local function Start()
 	cor = coroutine.create(DefragBags)
 	frame:SetScript("OnUpdate", frame.OnUpdate)
 end
-
-
 
 -----------
 -- Class --
@@ -291,13 +440,7 @@ function ns.BagFrame:New(configTable)
 	end
 
 	if configTable.Position then
-		local pos = configTable.Position
-		pos[2] = UIParent
-		instance:ClearAllPoints()
-		instance:SetPoint(unpack(pos))
-
-		SV_bags[instance.Id].Position = pos
-		SavedVariablesManager.Save(SV_BAGS_STR)
+		instance:SetPosition(configTable.Position)
 	end
 
 	-- Master bag dependant layout
@@ -346,6 +489,32 @@ function ns.BagFrame:New(configTable)
 	end
 
 	return instance
+end
+
+function ns.BagFrame:SetPosition(pos)
+	pos[2] = UIParent
+	self:ClearAllPoints()
+	self:SetPoint(unpack(pos))
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	SV_bags[self.Id].Position = pos
+	SV_bags[self.Id].Position[2] = nil
+	SavedVariablesManager.Save(SV_BAGS_STR)
+end
+
+function ns.BagFrame:GetConfigTable()
+	local configTable = {
+		IsMasterBag = self.IsMasterBag,
+		NumColumns = self.NumColumns,
+		Slots = {}, -- Added below
+		Position = { self:GetPoint() },
+	}
+
+	for _,v in pairs(self.GridView.items) do
+		table.insert(configTable.Slots, v:GetPhysicalIdentifier())
+	end
+
+	return configTable
 end
 
 function ns.BagFrame.OnMouseDown(self, btn)
