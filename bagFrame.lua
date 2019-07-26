@@ -34,6 +34,7 @@ end
 local SV_BAGS_STR = "Bags"
 ns.BagFrame.DefaultConfigTable = {
 	IsMasterBag = false,
+	Title = "My Custom Bag",
 	NumColumns = 1,
 	Slots = {},
 	Position = {
@@ -492,9 +493,10 @@ function ns.BagFrame:New(configTable)
 		parent = UIParent,
 		inheritsFrame = nil
 	})
-	instance.IsMasterBag = configTable.IsMasterBag
+
 	table.insert(createdBags, instance)
 	instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
+	instance.IsMasterBag = configTable.IsMasterBag
 
 	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
 	if not SV_bags then
@@ -514,6 +516,11 @@ function ns.BagFrame:New(configTable)
 
 	if configTable.Position then
 		instance:SetPosition(configTable.Position)
+	end
+
+	if configTable.Title then
+		instance.Title:SetText(configTable.Title)
+		SV_bags[instance.Id].Title = instance.Title:GetText()
 	end
 
 	-- Master bag dependant layout
@@ -578,6 +585,7 @@ end
 function ns.BagFrame:GetConfigTable()
 	local configTable = {
 		IsMasterBag = self.IsMasterBag,
+		Title = self.Title:GetText(),
 		NumColumns = self.NumColumns,
 		Slots = {}, -- Added below
 		Position = { self:GetPoint() },
@@ -614,7 +622,7 @@ function ns.BagFrame.BtnDelete_OnClick(self, btn)
 end
 
 function ns.BagFrame.BtnNew_OnClick(self, btn)
-	ns.BagSetupFrame:Show()
+	ns.BagSetupFrame:Open(nil, false)
 end
 
 function ns.BagFrame.BtnDefrag_OnClick(self, btn)

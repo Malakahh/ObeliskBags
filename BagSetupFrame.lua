@@ -1,10 +1,19 @@
 local addonName, ns = ...
 local className = "BagSetupFrame"
 
+---------------
+-- Libraries --
+---------------
+
+local libSliderEditBox = ObeliskFrameworkManager:GetLibrary("ObeliskSliderEditBox", 0)
+if not libSliderEditBox then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskSliderEditBox"))
+end
+
 ns.BagSetupFrame = CreateFrame("FRAME", addonName .. className, UIParent)
 
 local padding = 9
-local spacing = 12
+local spacing = 20
 
 -- Frame
 ns.BagSetupFrame:SetPoint("CENTER")
@@ -45,72 +54,60 @@ ns.BagSetupFrame.BtnCreate:SetSize(100, 22)
 ns.BagSetupFrame.BtnCreate:SetPoint("RIGHT", ns.BagSetupFrame.BtnCancel, "LEFT", -padding, 0)
 ns.BagSetupFrame.BtnCreate:SetText("Create")
 ns.BagSetupFrame.BtnCreate:SetScript("OnClick", function(btn)
-	--ns.BagFrame.Spawn(ns.BagSetupFrame.ColumnSlider:GetValue(), ns.BagSetupFrame.SlotSlider:GetValue())
 	local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
 	bagConfig.NumColumns = ns.BagSetupFrame.ColumnSlider:GetValue()
 	bagConfig.Slots = ns.BagSetupFrame.SlotSlider:GetValue()
+	bagConfig.Title = ns.BagSetupFrame.EditBoxBagTitle:GetText()
 	ns.BagFrame:New(bagConfig)
 	ns.BagSetupFrame:Hide()
 end)
+
+-- BagNameHeader
+ns.BagSetupFrame.BagTitleHeader = ns.BagSetupFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+ns.BagSetupFrame.BagTitleHeader:SetText("Bag Title:")
+ns.BagSetupFrame.BagTitleHeader:SetPoint("TOP", ns.BagSetupFrame.Title, "BOTTOM", 0, -spacing)
+
+ns.BagSetupFrame.EditBoxBagTitle = CreateFrame("EditBox", nil, ns.BagSetupFrame, "InputBoxTemplate")
+ns.BagSetupFrame.EditBoxBagTitle:SetAutoFocus(false)
+ns.BagSetupFrame.EditBoxBagTitle:SetSize(165, 20)
+ns.BagSetupFrame.EditBoxBagTitle:SetPoint("TOP", ns.BagSetupFrame.BagTitleHeader, "BOTTOM", 0, -5)
 
 ----------
 -- Sliders
 
 -- Slot slider
-ns.BagSetupFrame.SlotSlider = CreateFrame("Slider", addonName .. className .. "SlotSlider", ns.BagSetupFrame, "OptionsSliderTemplate")
-ns.BagSetupFrame.SlotSlider.CurrentText = ns.BagSetupFrame.SlotSlider:CreateFontString(nil, "ARTWORK", "OptionsFontSmall")
-ns.BagSetupFrame.SlotSlider.CurrentText:SetPoint("TOP", ns.BagSetupFrame.SlotSlider, "BOTTOM", 0, 0)
-ns.BagSetupFrame.SlotSlider:SetOrientation("HORIZONTAL")
-ns.BagSetupFrame.SlotSlider:SetSize(115, 20)
-ns.BagSetupFrame.SlotSlider:SetPoint("TOPRIGHT", ns.BagSetupFrame.Title, "BOTTOM", -spacing, -(padding + spacing))
-ns.BagSetupFrame.SlotSlider:SetObeyStepOnDrag(true)
-ns.BagSetupFrame.SlotSlider:SetValueStep(1)
-ns.BagSetupFrame.SlotSlider:SetScript("OnValueChanged", function(self, value)
-	self.CurrentText:SetText(value)
-
+ns.BagSetupFrame.SlotSlider = libSliderEditBox(addonName .. className .. "SlotSlider", ns.BagSetupFrame, "Slots:", function(self, value)
 	ns.BagSetupFrame.ColumnSlider:SetMinMaxValues(1, value)
-	_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "High"]:SetText(value)
 end)
+ns.BagSetupFrame.SlotSlider:SetSize(175, 40)
+ns.BagSetupFrame.SlotSlider:SetPoint("TOP", ns.BagSetupFrame.EditBoxBagTitle, "BOTTOM", 0, -(padding + spacing))
 ns.BagSetupFrame.SlotSlider:SetValue(1)
-_G[ns.BagSetupFrame.SlotSlider:GetName() .. "Text"]:SetText("Slots:")
 
 -- Column slider
-ns.BagSetupFrame.ColumnSlider = CreateFrame("Slider", addonName .. className .. "ColumnSlider", ns.BagSetupFrame, "OptionsSliderTemplate")
-ns.BagSetupFrame.ColumnSlider.CurrentText = ns.BagSetupFrame.ColumnSlider:CreateFontString(nil, "ARTWORK", "OptionsFontSmall")
-ns.BagSetupFrame.ColumnSlider.CurrentText:SetPoint("TOP", ns.BagSetupFrame.ColumnSlider, "BOTTOM", 0, 0)
-ns.BagSetupFrame.ColumnSlider:SetOrientation("HORIZONTAL")
-ns.BagSetupFrame.ColumnSlider:SetSize(115, 20)
-ns.BagSetupFrame.ColumnSlider:SetPoint("TOPLEFT", ns.BagSetupFrame.Title, "BOTTOM", spacing, -(padding + spacing))
-ns.BagSetupFrame.ColumnSlider:SetObeyStepOnDrag(true)
-ns.BagSetupFrame.ColumnSlider:SetValueStep(1)
-ns.BagSetupFrame.ColumnSlider:SetScript("OnValueChanged", function(self, value)
-	self.CurrentText:SetText(value)
-end)
+ns.BagSetupFrame.ColumnSlider = libSliderEditBox(addonName .. className .. "ColumnSlider", ns.BagSetupFrame, "Columns:", nil)
+ns.BagSetupFrame.ColumnSlider:SetSize(175, 40)
+ns.BagSetupFrame.ColumnSlider:SetPoint("TOP", ns.BagSetupFrame.SlotSlider, "BOTTOM", 0, - spacing)
 ns.BagSetupFrame.ColumnSlider:SetValue(1)
-_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "Text"]:SetText("Columns:")
-
 
 function ns.BagSetupFrame:ResetForms()
 	local slotDefault = 1
 	self.SlotSlider:SetMinMaxValues(1, ns.InventorySlotPool:Count())
-	_G[ns.BagSetupFrame.SlotSlider:GetName() .. "Low"]:SetText(1)
-	_G[ns.BagSetupFrame.SlotSlider:GetName() .. "High"]:SetText(ns.InventorySlotPool:Count())
 	self.SlotSlider:SetValue(slotDefault)
 
-	self.ColumnSlider:SetMinMaxValues(1, 1)
-	_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "Low"]:SetText(1)
-	_G[ns.BagSetupFrame.ColumnSlider:GetName() .. "High"]:SetText(slotDefault)
+	self.ColumnSlider:SetMinMaxValues(1, slotDefault)
 	self.ColumnSlider:SetValue(1)
+
+	self.EditBoxBagTitle:SetText("My Custom Bag")
 end
 
 function ns.BagSetupFrame:Open(bagframe, isEdit)
 	if isEdit then
 		self:ResetForms()
-		ns.BagSetupFrame.Title:SetText("Edit - " .. bagframe.Title:GetText())
+		self.Title:SetText("Edit - " .. bagframe.Title:GetText())
 	else
 		self:ResetForms()
-		ns.BagSetupFrame.Title:SetText("New Bag")
+		self.Title:SetText("Create new bag")
 	end
 
-
+	self:Show()
 end
