@@ -1,0 +1,944 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"wor",
+				"workingBag"
+			],
+			[
+				"shoul",
+				"shouldClose"
+			],
+			[
+				"BagFa",
+				"BagFamily"
+			],
+			[
+				"Master",
+				"MasterBags"
+			],
+			[
+				"Bag",
+				"BagFamily"
+			],
+			[
+				"Ban",
+				"BankUpdate"
+			],
+			[
+				"all",
+				"allInventorySlots"
+			],
+			[
+				"Ba",
+				"BagFamilies"
+			],
+			[
+				"Inve",
+				"Inventory"
+			],
+			[
+				"master",
+				"masterBagConfig"
+			],
+			[
+				"Cate",
+				"Category"
+			],
+			[
+				"SV_",
+				"SV_BAGS_STR"
+			],
+			[
+				"Inven",
+				"inventory"
+			],
+			[
+				"Mas",
+				"MasterBags"
+			],
+			[
+				"masterba",
+				"masterBagConfig"
+			],
+			[
+				"w",
+				"workingSet"
+			],
+			[
+				"Spawn",
+				"SpawnBankBags"
+			],
+			[
+				"Collec",
+				"CollectBankSlots"
+			],
+			[
+				"CREATE",
+				"CreateFrame"
+			],
+			[
+				"from",
+				"fromSlot"
+			],
+			[
+				"created",
+				"createdBags"
+			],
+			[
+				"GetP",
+				"GetPhysicalIdentifier"
+			],
+			[
+				"item",
+				"items"
+			],
+			[
+				"grid",
+				"gridView"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"GetPo",
+				"GetPosition"
+			],
+			[
+				"virt",
+				"virtItemSlots"
+			],
+			[
+				"Create",
+				"createdBags"
+			],
+			[
+				"vir",
+				"virtItemSlots"
+			],
+			[
+				"phy",
+				"physSlot"
+			],
+			[
+				"vi",
+				"virtual"
+			],
+			[
+				"Clea",
+				"ClearAllPoints"
+			],
+			[
+				"tab",
+				"table"
+			],
+			[
+				"__",
+				"__WorkingTable"
+			],
+			[
+				"_",
+				"__WorkingTable"
+			],
+			[
+				"swap",
+				"swap1"
+			],
+			[
+				"cycl",
+				"cycleStart"
+			],
+			[
+				"compa",
+				"Compare"
+			],
+			[
+				"N",
+				"NumColumns"
+			],
+			[
+				"mas",
+				"masterBagConfig"
+			],
+			[
+				"SV_B",
+				"SV_bags"
+			],
+			[
+				"PROP",
+				"PROPERTY_GET_PREFIX"
+			],
+			[
+				"BtnDe",
+				"BtnDefrag"
+			],
+			[
+				"On",
+				"OnMouseUp"
+			],
+			[
+				"add",
+				"addonName"
+			],
+			[
+				"save",
+				"SavedVariablesManager"
+			],
+			[
+				"tal",
+				"tableKey"
+			],
+			[
+				"Save",
+				"SavedVariablesManager"
+			],
+			[
+				"table",
+				"tableKey"
+			],
+			[
+				"new",
+				"New"
+			],
+			[
+				"fra",
+				"frameType"
+			],
+			[
+				"inh",
+				"inheritsFrame"
+			],
+			[
+				"Frame",
+				"FrameworkClass"
+			],
+			[
+				"Phy",
+				"GetPhysicalIdentifier"
+			],
+			[
+				"func",
+				"function\tfunction"
+			],
+			[
+				"co",
+				"coroutine"
+			],
+			[
+				"C",
+				"CycleSort"
+			],
+			[
+				"cycle",
+				"cycleStart"
+			],
+			[
+				"num",
+				"numberOfFreeSlots"
+			],
+			[
+				"create",
+				"createdBags"
+			],
+			[
+				"old",
+				"oldBagData"
+			],
+			[
+				"crea",
+				"createdBagsTemp"
+			],
+			[
+				"Dele",
+				"DeleteBag"
+			],
+			[
+				"Defrag",
+				"DefragBags"
+			],
+			[
+				"btnde",
+				"BtnDefrag"
+			],
+			[
+				"Btn",
+				"BtnConfig"
+			],
+			[
+				"Icon",
+				"IconQuestTexture"
+			],
+			[
+				"Ico",
+				"IconBorder"
+			],
+			[
+				"Item",
+				"ItemCount"
+			],
+			[
+				"SetTe",
+				"SetText"
+			],
+			[
+				"BOTT",
+				"BOTTOMRIGHT"
+			],
+			[
+				"UIPa",
+				"UIPanelButtonTemplate"
+			],
+			[
+				"gri",
+				"gridWidth"
+			],
+			[
+				"maxnum",
+				"maxNumRows"
+			],
+			[
+				"max",
+				"maxNumColumns"
+			],
+			[
+				"vert",
+				"VerticalCellMargin"
+			],
+			[
+				"hori",
+				"HorizontalCellMargin"
+			],
+			[
+				"calcula",
+				"calculatedWidth"
+			],
+			[
+				"calc",
+				"calculatedWidth"
+			],
+			[
+				"ver",
+				"VerticalCellMargin"
+			],
+			[
+				"calcu",
+				"calculatedHeight"
+			],
+			[
+				"hor",
+				"HorizontalCellMargin"
+			],
+			[
+				"Colum",
+				"ColumnSlider"
+			],
+			[
+				"Colu",
+				"ColumnSlider"
+			],
+			[
+				"Slider",
+				"SliderValueChanged"
+			],
+			[
+				"Col",
+				"ColumnSlider"
+			],
+			[
+				"BtnC",
+				"BtnCancel"
+			],
+			[
+				"CreateF",
+				"CreateFrame"
+			],
+			[
+				"pla",
+				"playerId"
+			],
+			[
+				"ve",
+				"vehicle"
+			],
+			[
+				"vehi",
+				"vehiclePrototype"
+			],
+			[
+				"playe",
+				"playerId"
+			],
+			[
+				"player",
+				"player_index"
+			],
+			[
+				"digg",
+				"diggingWidth"
+			],
+			[
+				"play",
+				"playerId"
+			],
+			[
+				"rotat",
+				"rotationInRad"
+			],
+			[
+				"dig",
+				"diggingWidth"
+			],
+			[
+				"entit",
+				"entityPos"
+			],
+			[
+				"enti",
+				"entityPos"
+			],
+			[
+				"map",
+				"mapColorBedrockIron"
+			],
+			[
+				"mapColo",
+				"mapColorBedrock"
+			],
+			[
+				"mapCo",
+				"mapColorBedrock"
+			],
+			[
+				"pic",
+				"picturesBedrockIron"
+			],
+			[
+				"bedr",
+				"bedrock-iron"
+			],
+			[
+				"bedro",
+				"bedrock-copper"
+			],
+			[
+				"pi",
+				"picturesBedrock"
+			],
+			[
+				"tabl",
+				"tableUtil"
+			],
+			[
+				"m",
+				"miningChargeDamage"
+			],
+			[
+				"atta",
+				"attackParameters"
+			],
+			[
+				"minin",
+				"miningChargeName"
+			],
+			[
+				"mining",
+				"miningChargeControls"
+			],
+			[
+				"pro",
+				"projectiles"
+			],
+			[
+				"proj",
+				"projectileInfo"
+			],
+			[
+				"molem",
+				"moleMachineControl"
+			],
+			[
+				"dama",
+				"damageType"
+			],
+			[
+				"perlin",
+				"perlinVal"
+			],
+			[
+				"p",
+				"pSP"
+			],
+			[
+				"inven",
+				"inventorySlot"
+			],
+			[
+				"di",
+				"dig"
+			],
+			[
+				"patt",
+				"patternMaterials"
+			],
+			[
+				"end",
+				"endX"
+			],
+			[
+				"Buil",
+				"BuildBlueprint"
+			],
+			[
+				"scu",
+				"successiveIdx"
+			],
+			[
+				"patte",
+				"patternMaterials"
+			],
+			[
+				"patter",
+				"patternIdx"
+			],
+			[
+				"blue",
+				"blueprintIdx"
+			],
+			[
+				"For",
+				"forward"
+			],
+			[
+				"ite",
+				"itemId"
+			]
+		]
+	},
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"obelisk",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"snippet: wow",
+				"Snippet: WoWAddonLuaClass"
+			],
+			[
+				"pretty json: pr",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"pretty",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"format",
+				"FormatLua: Format Lua code"
+			],
+			[
+				"package control",
+				"Package Control: Remove Package"
+			],
+			[
+				"lua",
+				"LuaFormat: Key Bindings"
+			],
+			[
+				"snipp",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"obel",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"sni",
+				"Snippet: WoWAddonLuaClass"
+			],
+			[
+				"snippet",
+				"Snippet: WoWAddon"
+			],
+			[
+				"snip",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"obe",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"obelisk\t",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"test",
+				"Snippet: testsnip"
+			],
+			[
+				"Snippet: ",
+				"Snippet: function"
+			],
+			[
+				"comment",
+				"Toggle Comment"
+			],
+			[
+				"theme",
+				"UI: Select Color Scheme"
+			],
+			[
+				"js",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"json",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"al",
+				"AlignTab"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"alignta",
+				"AlignTab"
+			]
+		],
+		"width": 412.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/ObeliskBags.toc",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
+		"/D/Games/World of Warcraft/_retail_/Logs/taint.log",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/TestAddon/main.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/TestAddon/TestAddon.toc",
+		"/C/Users/micha/Desktop/DJBags/src/bagItem/BagItem.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/containerSlotManager.lua",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/GlueXML/OptionsPanelTemplates.xml",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSetupFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/SliderEditBox.lua",
+		"/D/Games/SkyFactory_4_Server_4.0.8/server.properties",
+		"/D/Games/SkyFactory_4_Server_4.0.8/settings.bat",
+		"/C/Users/micha/Desktop/AddonRelease/AddonRelease/Program.cs",
+		"/C/Users/micha/Desktop/WoWAddonReleaseTool/WoWAddonReleaseTool/Program.cs",
+		"/C/Users/micha/Desktop/ConsoleApp1/ConsoleApp1/Program.cs",
+		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskMinimap.lua",
+		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskQuest.lua",
+		"/C/Users/micha/Desktop/deleteme/deleteme/Form1.cs",
+		"/C/Users/micha/Desktop/Genie/Genie.lua",
+		"/C/Users/micha/Desktop/Genie/embeds.xml",
+		"/C/Users/micha/Desktop/Genie_LDB/LDB+I.lua",
+		"/C/Users/micha/Desktop/Genie_UI/GenieUI.lua",
+		"/C/Users/micha/Desktop/Genie_LDB/Genie_LDB.toc",
+		"/C/Users/micha/Desktop/Genie/Libs/AceDB-3.0/AceDB-3.0.lua",
+		"/D/Games/SkyFactory_4_Server_4.0.8/options.txt",
+		"/D/Games/SkyFactory_4_Server_4.0.8/ops.json",
+		"/D/Games/Curse Client/GameInstances/MinecraftGameInstance.json",
+		"/D/Games/SkyFactory_4_Server_4.0.8/ServerStart.bat",
+		"/D/Games/SkyFactory_4_Server_4.0.8/eula.txt",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/util.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/Collections/Stack.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/ObeliskMinimap.toc",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/ObeliskSystemInclude.xml",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkClass.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/GridView.lua",
+		"/C/Users/micha/AppData/Roaming/Sublime Text 3/Packages/User/ObeliskLib.sublime-snippet",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/SerializableData.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrameData.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/ObeliskInclude.xml",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkClassOld.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/main.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkManager.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/Options.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/libs/ObeliskFramework/FrameworkClass.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/_bagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/QuickSort.lua",
+		"/C/Users/micha/Desktop/Skada/Skada.lua",
+		"/C/Users/micha/Desktop/Skada/BarDisplay.lua",
+		"/C/Users/micha/Desktop/Skada/BrokerDisplay.lua",
+		"/C/Users/micha/Desktop/Skada/embeds.xml",
+		"/C/Users/micha/Desktop/Skada/modules.xml",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.187/Skada.lua",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.261/Menus.lua",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.314/Options.lua",
+		"/C/Users/micha/Desktop/Skada/Menus.lua",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/FrameXML/ContainerFrame.xml",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/inventory.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/main.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/debug.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/libs/ObeliskFramework/UI/GridView.lua",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/FrameXML/UI.xsd",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/FrameXML/Minimap.xml",
+		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/FrameXML/Minimap.lua",
+		"/C/Users/micha/.ssh/id_rsa",
+		"/D/Games/World of Warcraft/Interface/AddOns/ObeliskMinimap/minimap.lua",
+		"/D/Games/World of Warcraft/BlizzardInterfaceCode/Interface/FrameXML/SecureTemplates.xml",
+		"/D/Games/World of Warcraft/BlizzardInterfaceCode/Interface/FrameXML/AlertFrames.xml",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.627/MouseLook.lua",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.404/MouseLook.lua",
+		"/D/Games/World of Warcraft - WoTLK/Interface/AddOns/Mouselook/main.lua",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.685/MouseLook.lua",
+		"/D/Games/World of Warcraft - WoTLK/WTF/Account/ROTTERWORKS/bindings-cache.wtf",
+		"/D/Games/World of Warcraft - WoTLK/Interface/AddOns/Mouselook/Bindings.XML",
+		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.397/Mouse_Look_Lock.toc",
+		"/D/Dropbox/laptop winkey.txt",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.1.0/prototypes/vehicles/moleMachine.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.1.0/controls/tools/miningChargeControls.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.1.0/controls/tools/miningGrenadeControls.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.1.0/libs/Util/MathUtil.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/controls/tools/miningChargeControls.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/core/locale/en/core.cfg",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/locale/en/base.cfg",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/locale/en/en.cfg",
+		"/C/Users/micha/AppData/Roaming/Factorio/config/config.ini",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/tools/miningGrenade.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/entity/entities.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/locale/en/en.cfg",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/data.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/TerraIncognita_0.0.1/scout.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/libs/Util/Blob.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/vehicles/moleMachine.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/settings.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/TerraIncognita_0.0.1/control.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/TerraIncognita_0.0.1/MapProvider.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/entity/resources.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/entity/demo-entities.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/libs/Blob/Blob.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/world/bedrock-iron.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/world/bedrock-copper.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/world/bedrock-coal.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobotCommandTool/brobotCommandTool.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/prototypes/world/bedrock.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Bedrock_0.0.1/data.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/info.json",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/control.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/controls/vehicles/moleMachineControls.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/locale/en/en.cfg",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/world/caveWall.lua",
+		"/C/Users/micha/Desktop/AC_230119-213938_O_lotus_exos_125_s1_spa_.dat",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/data.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/module-category.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/ammo-category.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/entity/fire.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/item.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/capsule.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/equipment.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/damage-type.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/factorio-current.log",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobot/brobot.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobotCommandTool/brobotTarget.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobotCommandTool/brobotSelection.lua",
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/tools/fuse.lua",
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/ammo.lua"
+	],
+	"find":
+	{
+		"height": 42.0
+	},
+	"find_in_files":
+	{
+		"height": 117.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"createdBags",
+			"print",
+			"BagFamil",
+			"pool",
+			"Category",
+			"pool",
+			"InventorySlotPool",
+			"Cooking",
+			"ns.MasterBag",
+			"testlol",
+			"ContainerFrame",
+			"testlol",
+			"obeliskbags",
+			"ContainerFrameItemButtonTemplate",
+			"obeliskbags",
+			"bags",
+			"obe",
+			"ob",
+			"obelisk",
+			"slot",
+			"ItemSlot.",
+			"slot:GetName()",
+			"UseContainerItem",
+			"PLAYER_LOGIN",
+			"ItemCache",
+			"ContainerSlotManager"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"incremental_find":
+	{
+		"height": 31.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 130.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"replace":
+	{
+		"height": 58.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"sni",
+				"C:\\Users\\micha\\AppData\\Roaming\\Sublime Text 3\\Packages\\User\\WoWAddonLuaClass.sublime-snippet"
+			],
+			[
+				"motion",
+				"Drivers\\EasyMotion.lua"
+			],
+			[
+				"testsni",
+				"C:\\Users\\micha\\AppData\\Roaming\\Sublime Text 3\\Packages\\User\\testsnip.sublime-snippet"
+			],
+			[
+				"",
+				"D:\\GitRepos\\Silvia\\Silvia\\SilviaBootstrapper\\bin\\Debug\\Settings\\SilviaGUI\\SilviaGUI.SilviaGUI.Hi"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 238.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+		"max_columns": 2
+	}
+}

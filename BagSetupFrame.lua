@@ -27,12 +27,9 @@ ns.BagSetupFrame:SetBackdrop({
 })
 ns.BagSetupFrame:SetBackdropColor(0, 0, 0, 1)
 ns.BagSetupFrame:SetClampedToScreen(true)
-ns.BagSetupFrame:SetSize(300, 200)
+ns.BagSetupFrame:SetSize(300, 300)
 ns.BagSetupFrame:SetFrameStrata("TOOLTIP")
 ns.BagSetupFrame:EnableMouse(true)
-ns.BagSetupFrame:SetScript("OnShow", function(self)
-	self:ResetForms()
-end)
 ns.BagSetupFrame:Hide()
 
 -- Title
@@ -52,13 +49,31 @@ end)
 ns.BagSetupFrame.BtnCreate = CreateFrame("Button", addonName .. className .. "Create", ns.BagSetupFrame, "UIPanelButtonTemplate")
 ns.BagSetupFrame.BtnCreate:SetSize(100, 22)
 ns.BagSetupFrame.BtnCreate:SetPoint("RIGHT", ns.BagSetupFrame.BtnCancel, "LEFT", -padding, 0)
-ns.BagSetupFrame.BtnCreate:SetText("Create")
 ns.BagSetupFrame.BtnCreate:SetScript("OnClick", function(btn)
-	local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
-	bagConfig.NumColumns = ns.BagSetupFrame.ColumnSlider:GetValue()
-	bagConfig.Slots = ns.BagSetupFrame.SlotSlider:GetValue()
-	bagConfig.Title = ns.BagSetupFrame.EditBoxBagTitle:GetText()
-	ns.BagFrame:New(bagConfig)
+	local configTable
+	if ns.BagSetupFrame.BagFrame then
+		configTable = ns.BagSetupFrame.BagFrame:GetConfigTable()
+
+		if not configTable.IsMasterBag then
+			ns.BagSetupFrame.BagFrame:DeleteBag()
+		end
+	else
+		configTable = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
+	end
+
+	configTable.NumColumns = ns.BagSetupFrame.ColumnSlider:GetValue()
+	configTable.Slots = ns.BagSetupFrame.SlotSlider:GetValue()
+	configTable.Title = ns.BagSetupFrame.EditBoxBagTitle:GetText()
+	configTable.BagFamily = ns.BagSetupFrame.BagFamily
+
+	if configTable.IsMasterBag then
+		ns.BagSetupFrame.BagFrame.TitleText = configTable.Title
+		ns.BagSetupFrame.BagFrame.NumColumns = configTable.NumColumns
+		ns.BagSetupFrame.BagFrame:Update()
+	else
+		ns.BagFrame:New(configTable)
+	end
+
 	ns.BagSetupFrame:Hide()
 end)
 
@@ -86,27 +101,40 @@ ns.BagSetupFrame.SlotSlider:SetValue(1)
 -- Column slider
 ns.BagSetupFrame.ColumnSlider = libSliderEditBox(addonName .. className .. "ColumnSlider", ns.BagSetupFrame, "Columns:", nil)
 ns.BagSetupFrame.ColumnSlider:SetSize(175, 40)
-ns.BagSetupFrame.ColumnSlider:SetPoint("TOP", ns.BagSetupFrame.SlotSlider, "BOTTOM", 0, - spacing)
+ns.BagSetupFrame.ColumnSlider:SetPoint("TOP", ns.BagSetupFrame.SlotSlider, "BOTTOM", 0, -(padding + spacing))
 ns.BagSetupFrame.ColumnSlider:SetValue(1)
 
-function ns.BagSetupFrame:ResetForms()
-	local slotDefault = 1
-	self.SlotSlider:SetMinMaxValues(1, ns.InventorySlotPool:Count())
-	self.SlotSlider:SetValue(slotDefault)
+function ns.BagSetupFrame:ResetForms(slotVal, columnVal, title, bagFrame, bagFamily)
+	self.BagFrame = bagFrame
+	self.BagFamily = bagFamily
 
-	self.ColumnSlider:SetMinMaxValues(1, slotDefault)
-	self.ColumnSlider:SetValue(1)
+	self.SlotSlider:SetMinMaxValues(1, ns.SlotPools[self.BagFamily]:Count())
+	self.SlotSlider:SetValue(slotVal)
+	self.SlotSlider:SetEnable(true)
+	if self.BagFrame then
+		local configTable = self.BagFrame:GetConfigTable()
+		if configTable.IsMasterBag then
+			self.SlotSlider:SetEnable(false)
+		end
+	end
 
-	self.EditBoxBagTitle:SetText("My Custom Bag")
+	self.ColumnSlider:SetMinMaxValues(1, slotVal)
+	self.ColumnSlider:SetValue(columnVal)
+
+	self.EditBoxBagTitle:SetText(title)	
 end
 
-function ns.BagSetupFrame:Open(bagframe, isEdit)
+function ns.BagSetupFrame:Open(bagframe, isEdit, bagFamily)
 	if isEdit then
-		self:ResetForms()
-		self.Title:SetText("Edit - " .. bagframe.Title:GetText())
+		local configTable = bagframe:GetConfigTable()
+		self:ResetForms(#configTable.Slots, configTable.NumColumns, configTable.Title, bagframe, bagFamily)
+		self.Title:SetText("Edit - " .. configTable.Title)
+		self.BtnCreate:SetText("Edit")
 	else
-		self:ResetForms()
+		local slotDefault = 1
+		self:ResetForms(slotDefault, slotDefault, ns.BagFrame.DefaultConfigTable.Title, nil, bagFamily)
 		self.Title:SetText("Create new bag")
+		self.BtnCreate:SetText("Create")
 	end
 
 	self:Show()

@@ -88,6 +88,7 @@ function ns.BagFrame:LayoutInit()
 		self.MoneyFrame:SetPoint("BOTTOMRIGHT", self.padding, self.padding * 1.5)
 
 		self.BtnNewBag:SetScript("OnClick", self.BtnNew_OnClick)
+		self.BtnConfig:SetScript("OnClick", self.BtnConfig_OnClick)
 		self.BtnDefrag:SetScript("OnClick", self.BtnDefrag_OnClick)
 	else
 		self.BtnDelete = CreateFrame("BUTTON", addonName .. "DeleteButton", self, "UIPanelButtonTemplate")
@@ -97,5 +98,12 @@ function ns.BagFrame:LayoutInit()
 		self.BtnDelete:SetScript("OnClick", self.BtnDelete_OnClick)
 
 		self.BtnConfig:SetPoint("LEFT", self.BtnDelete, "RIGHT", self.spacing, 0)
+		self.BtnConfig:SetScript("OnClick", self.BtnConfig_OnClick)
+	end
+end
+
+function ns.BagFrame:LayoutInitDelayed()
+	if self.IsMasterBag and self.BagFamily ~= ns.BagFamilies.Inventory() then
+		self.MoneyFrame:Hide()
 	end
 end

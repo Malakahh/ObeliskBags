@@ -2,4 +2,7 @@
 	<Binding name="OB_TOGGLE" header="OB_H">
 		ObeliskBags_ToggleBags();
 	</Binding>
+	<Binding name="OB_BANK_TOGGLE">
+		ObeliskBags_ToggleBank()
+	</Binding>
 </Bindings>

@@ -27,18 +27,19 @@ function ns.BagSlot:New(bagId, slotId, parent)
 		frameName = addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId),
 		parent = parent,
 	})
-	instance:SetID(bagId)
+
+	instance.ContainerFrame = CreateFrame("Frame", nil, instance)
+	instance.ContainerFrame:SetID(bagId)
+	instance.ContainerFrame:SetAllPoints(instance)
 
 	local backgroundTexture = instance:CreateTexture(instance:GetName() .. "NormalTexture", "BACKGROUND")
 	backgroundTexture:SetTexture("Interface\\BUTTONS\\UI-Slot-Background")
 	backgroundTexture:SetTexCoord(0, 0.640625, 0, 0.640625)
 	backgroundTexture:SetAllPoints()
 
-
-	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), instance, "ContainerFrameItemButtonTemplate")
+	local slot = CreateFrame("Button", addonName .. "ItemSlot" .. ns.BagSlot.EncodeSlotIdentifier(bagId, slotId), instance.ContainerFrame, "ContainerFrameItemButtonTemplate")
+	slot:SetAllPoints(instance.ContainerFrame)
 	slot:SetID(slotId)
-	slot:SetPoint("TOPLEFT")
-	slot:SetPoint("BOTTOMRIGHT")
 	slot:Show()
 
 	slot.BattlepayItemTexture:Hide()
@@ -84,7 +85,7 @@ function ns.BagSlot:SetItem(itemId)
 	if type(itemId) == "number" then
 		local item = ns.ItemCache:GetInfo(itemId, true)
 
-		local bagId = self:GetID()
+		local bagId = self.ContainerFrame:GetID()
 		local slotId = self.ItemSlot:GetID()
 		local isQuestItem, questId, questIsActive = GetContainerItemQuestInfo(bagId, slotId)
 		local texture, count, _, quality, _, _, _, isFiltered = GetContainerItemInfo(bagId, slotId)
@@ -147,7 +148,7 @@ function ns.BagSlot.DecodeSlotIdentifier(slotIdentifier)
 end
 
 function ns.BagSlot:GetPhysicalIdentifier()
-	local bagId = self:GetID()
+	local bagId = self.ContainerFrame:GetID()
 	local slotId = self.ItemSlot:GetID()
 
 	return ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)

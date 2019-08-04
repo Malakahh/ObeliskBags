@@ -7,10 +7,11 @@
 ## SavedVariables: OB_SV
 
 libs\ObeliskFramework\ObeliskInclude.xml
-bindings.lua
+BagFamilies.lua
 ItemCache.lua
 BagSlot.lua
 BagFrame.lua
 BagFrame.Layout.lua
 BagSetupFrame.lua
 main.lua
+bindings.lua

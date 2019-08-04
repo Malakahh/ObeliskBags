@@ -44,14 +44,13 @@ ns.BagFrame.DefaultConfigTable = {
 		0,
 		0,
 	},
+	BagFamily = ns.BagFamilies.Inventory(),
 }
 
 -----------
 -- local --
 -----------
 
-
-local isShown = true
 local createdBags = {}
 
 local cycleSortFuncs = {
@@ -476,11 +475,6 @@ function ns.BagFrame:New(configTable)
 		return
 	end
 
-	if configTable.IsMasterBag and ns.MasterBag then
-		error(ns.Debug:sprint(addonName .. className, "Attempted to create multiple master bags"))
-		return
-	end
-
 	local name = addonName .. className
 	if configTable.IsMasterBag then
 		name = name .. "Master"
@@ -519,34 +513,44 @@ function ns.BagFrame:New(configTable)
 	end
 
 	if configTable.Title then
-		instance.Title:SetText(configTable.Title)
-		SV_bags[instance.Id].Title = instance.Title:GetText()
+		instance.TitleText = configTable.Title
+	end
+
+	if configTable.BagFamily then
+		instance.BagFamily = configTable.BagFamily
+		SV_bags[instance.Id].BagFamily = instance.BagFamily
+		SavedVariablesManager.Save(SV_BAGS_STR)
 	end
 
 	-- Master bag dependant layout
 	if instance.IsMasterBag then
 		-- Manually add to gridview to skip adding to available pool again
-		for i = 1, ns.InventorySlotPool:Count() do
-			local slot = ns.InventorySlotPool.items[i]
+		for i = 1, ns.SlotPools[instance.BagFamily]:Count() do
+			local slot = ns.SlotPools[instance.BagFamily].items[i]
 			instance.GridView:AddItem(slot)
 			slot:SetOwner(instance)
 		end
 
-		ns.MasterBag = instance
+		instance.Title:SetText(instance.Title:GetText() .. " - Master Bag - " .. instance.BagFamily)
+
+		instance.TreeShown = true
+		instance.Children = {}
+
+		-- TODO: Master bag should be a logo instead
 	elseif configTable.Slots then
 		if type(configTable.Slots) == "table" and #configTable.Slots > 0 then
 			local compFunc = function(key, value, phys) return value:GetPhysicalIdentifier() == phys end
 			for k,v in pairs(configTable.Slots) do
-				local idx = ns.Util.Table.IndexWhere(ns.InventorySlotPool.items, compFunc, v)
-				local slot = table.remove(ns.InventorySlotPool.items, idx)
-				ns.MasterBag:RemoveSlot(slot)
+				local idx = ns.Util.Table.IndexWhere(ns.SlotPools[instance.BagFamily].items, compFunc, v)
+				local slot = table.remove(ns.SlotPools[instance.BagFamily].items, idx)
+				ns.MasterBags[instance.BagFamily]:RemoveSlot(slot)
 				instance:AddSlot(slot)
 			end
 		elseif type(configTable.Slots) == "number" then
 			-- get slots
 			local slots = {}
 			for i = 1, configTable.Slots, 1 do
-				local slot = ns.InventorySlotPool:Pop()
+				local slot = ns.SlotPools[instance.BagFamily]:Pop()
 				table.insert(slots, slot)
 			end
 
@@ -555,7 +559,7 @@ function ns.BagFrame:New(configTable)
 			end)
 
 			for i = 1, #slots do
-				ns.MasterBag:RemoveSlot(slots[i])
+				ns.MasterBags[instance.BagFamily]:RemoveSlot(slots[i])
 			 	instance:AddSlot(slots[i])
 			end
 		end
@@ -564,9 +568,13 @@ function ns.BagFrame:New(configTable)
 		local gridWidth, gridHeight = instance.GridView:GetCalculatedGridSize()
 		instance:SetSize(gridWidth, gridHeight)
 
+		table.insert(ns.MasterBags[instance.BagFamily].Children, instance)
+
 		instance:Update()
-		ns.MasterBag:Update()
+		ns.MasterBags[instance.BagFamily]:Update()
 	end
+
+	instance:LayoutInitDelayed()
 
 	return instance
 end
@@ -589,7 +597,12 @@ function ns.BagFrame:GetConfigTable()
 		NumColumns = self.NumColumns,
 		Slots = {}, -- Added below
 		Position = { self:GetPoint() },
+		BagFamily = self.BagFamily,
 	}
+
+	for k,_ in pairs(ns.BagFrame.DefaultConfigTable) do
+		assert(configTable[k] ~= nil)
+	end	
 
 	for _,v in pairs(self.GridView.items) do
 		table.insert(configTable.Slots, v:GetPhysicalIdentifier())
@@ -622,7 +635,11 @@ function ns.BagFrame.BtnDelete_OnClick(self, btn)
 end
 
 function ns.BagFrame.BtnNew_OnClick(self, btn)
-	ns.BagSetupFrame:Open(nil, false)
+	ns.BagSetupFrame:Open(nil, false, self:GetParent().BagFamily)
+end
+
+function ns.BagFrame.BtnConfig_OnClick(self, btn)
+	ns.BagSetupFrame:Open(self:GetParent(), true, self:GetParent().BagFamily)
 end
 
 function ns.BagFrame.BtnDefrag_OnClick(self, btn)
@@ -644,10 +661,26 @@ ns.BagFrame[FrameworkClass.PROPERTY_SET_PREFIX .. "NumColumns"] = function(self,
 	return value
 end
 
+ns.BagFrame[FrameworkClass.PROPERTY_GET_PREFIX .. "TitleText"] = function(self, key)
+	return self.Title:GetText()
+end
+
+ns.BagFrame[FrameworkClass.PROPERTY_SET_PREFIX .. "TitleText"] = function(self, key, value)
+	self.Title:SetText(value)
+
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	SV_bags[self.Id].Title = self.Title:GetText()
+	SavedVariablesManager.Save(SV_BAGS_STR)
+
+	return value
+end
+
 function ns.BagFrame:DeleteBag()
-	self:MergeBag(ns.MasterBag)
+	self:MergeBag(ns.MasterBags[self.BagFamily])
 	ns.Util.Table.RemoveByVal(createdBags, self)
-	ns.MasterBag:Update()
+	ns.MasterBags[self.BagFamily]:Update()
+
+	ns.Util.Table.RemoveByVal(ns.MasterBags[self.BagFamily].Children, self)
 
 	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
 	SV_bags[self.Id] = nil
@@ -669,7 +702,7 @@ function ns.BagFrame:SortSlots()
 	self.GridView:Sort(compFunc)
 
 	if self.IsMasterBag then
-		table.sort(ns.InventorySlotPool.items, compFunc)
+		table.sort(ns.SlotPools[self.BagFamily].items, compFunc)
 	end
 end
 
@@ -687,7 +720,7 @@ function ns.BagFrame:AddSlot(slot)
 	SavedVariablesManager.Save(SV_BAGS_STR)
 
 	if self.IsMasterBag then
-		ns.InventorySlotPool:Push(slot)
+		ns.SlotPools[self.BagFamily]:Push(slot)
 	end
 end
 
@@ -727,15 +760,27 @@ function ns.BagFrame:Close()
 	self:Hide()
 	local flip = true
 
-	for _,v in pairs(createdBags) do
-		if v:IsVisible() then
+	local masterBag = ns.MasterBags[self.BagFamily]
+
+	local i = 0
+	repeat
+		local workingBag
+		if i == 0 then
+			workingBag = masterBag
+		else
+			workingBag = masterBag.Children[i]
+		end
+		
+		if workingBag:IsVisible() then
 			flip = false
 			break
 		end
-	end
+
+		i = i + 1
+	until(i > #masterBag.Children)
 
 	if flip then
-		isShown = false
+		masterBag.TreeShown = false
 	end
 end
 
@@ -743,27 +788,50 @@ function ns.BagFrame:Open()
 	self:Show()
 	local flip = true
 
-	for _,v in pairs(createdBags) do
-		if not v:IsVisible() then
+	local masterBag = ns.MasterBags[self.BagFamily]
+
+	local i = 0
+	repeat
+		local workingBag
+		if i == 0 then
+			workingBag = masterBag
+		else
+			workingBag = masterBag.Children[i]
+		end
+		
+		if not workingBag:IsVisible() then
 			flip = false
 			break
 		end
-	end
+
+		i = i + 1
+	until(i > #masterBag.Children)
 
 	if flip then
-		isShown = true
+		masterBag.TreeShown = true
 	end
 end
 
 function ns.BagFrame:ToggleBags()
-	local shoudClose = isShown
+	local masterBag = ns.MasterBags[self.BagFamily]
+	local shouldClose = masterBag.TreeShown
 
-	for k,v in pairs(createdBags) do
-		if shoudClose then
-			v:Close()
+	local i = 0
+	repeat
+		local workingBag
+		if i == 0 then
+			workingBag = masterBag
 		else
-			v:Open()
+			workingBag = masterBag.Children[i]
 		end
-	end
+
+		if shouldClose then
+			workingBag:Close()
+		else
+			workingBag:Open()
+		end
+
+		i = i + 1
+	until(i > #masterBag.Children)
 end
 

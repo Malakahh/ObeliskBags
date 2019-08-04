@@ -1,0 +1,20 @@
+-- Priority:
+Bag display (so that you can swap bags)
+Handle when bags are added / removed
+support for specialised bags (herb, engineering, ammo, soulshard, etc.)
+Automatic defragging
+GUI touchups (Master Bag icon, etc.)
+Options (Background colors, etc.)
+Remote view of bank
+Reagent tabs
+
+-- Nice to haves:
+Inspect inventory of alts
+server-wide money
+item search
+Item sorter per custom bag
+Slash commands
+Bag highlight
+
+-- Small todos:
+Make bags and setupframe close on pressing escape (I believe there's some stack mechanism in wow for this purpose?)
