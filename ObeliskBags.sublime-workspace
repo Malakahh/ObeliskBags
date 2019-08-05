@@ -4,16 +4,56 @@
 		"selected_items":
 		[
 			[
+				"Ph",
+				"PhysicalBags"
+			],
+			[
+				"Defra",
+				"Defrag"
+			],
+			[
+				"GetConta",
+				"GetContainerItemInfo"
+			],
+			[
+				"Iterat",
+				"IterateBagTree"
+			],
+			[
+				"Iter",
+				"IterateBagTree"
+			],
+			[
+				"Ite",
+				"IterateChildTree"
+			],
+			[
+				"Iterate",
+				"IterateChildTree"
+			],
+			[
+				"BagFa",
+				"BagFamily"
+			],
+			[
+				"phys",
+				"PhysicalBags"
+			],
+			[
+				"PROPER",
+				"PROPERTY_SET_PREFIX"
+			],
+			[
+				"Ba",
+				"BagFrame"
+			],
+			[
 				"wor",
 				"workingBag"
 			],
 			[
 				"shoul",
 				"shouldClose"
-			],
-			[
-				"BagFa",
-				"BagFamily"
 			],
 			[
 				"Master",
@@ -30,10 +70,6 @@
 			[
 				"all",
 				"allInventorySlots"
-			],
-			[
-				"Ba",
-				"BagFamilies"
 			],
 			[
 				"Inve",
@@ -478,42 +514,6 @@
 			[
 				"di",
 				"dig"
-			],
-			[
-				"patt",
-				"patternMaterials"
-			],
-			[
-				"end",
-				"endX"
-			],
-			[
-				"Buil",
-				"BuildBlueprint"
-			],
-			[
-				"scu",
-				"successiveIdx"
-			],
-			[
-				"patte",
-				"patternMaterials"
-			],
-			[
-				"patter",
-				"patternIdx"
-			],
-			[
-				"blue",
-				"blueprintIdx"
-			],
-			[
-				"For",
-				"forward"
-			],
-			[
-				"ite",
-				"itemId"
 			]
 		]
 	},
@@ -528,6 +528,18 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"obel",
+				"Snippet: ObeliskLib"
+			],
+			[
+				"class",
+				"Snippet: WoWAddonLuaClass"
+			],
+			[
+				"wow",
+				"Snippet: WoWAddonLuaClass"
+			],
 			[
 				"obelisk",
 				"Snippet: ObeliskLib"
@@ -566,10 +578,6 @@
 			],
 			[
 				"snipp",
-				"Snippet: ObeliskLib"
-			],
-			[
-				"obel",
 				"Snippet: ObeliskLib"
 			],
 			[
@@ -653,6 +661,10 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/TODO.txt",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.xml",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/ObeliskUIInclude.xml",
 		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/ObeliskBags.toc",
@@ -776,11 +788,7 @@
 		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/equipment.lua",
 		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/damage-type.lua",
 		"/C/Users/micha/AppData/Roaming/Factorio/factorio-current.log",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobot/brobot.lua",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobotCommandTool/brobotTarget.lua",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobotCommandTool/brobotSelection.lua",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/tools/fuse.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/ammo.lua"
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobot/brobot.lua"
 	],
 	"find":
 	{
@@ -799,6 +807,14 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"BagFamily",
+			"\")\n",
+			"self:GetParent()",
+			"IterateChildTree",
+			"--\n",
+			"Id",
+			"createdBags",
+			"()]:\n",
 			"createdBags",
 			"print",
 			"BagFamil",
@@ -857,11 +873,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":

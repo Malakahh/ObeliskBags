@@ -4,11 +4,11 @@ Handle when bags are added / removed
 support for specialised bags (herb, engineering, ammo, soulshard, etc.)
 Automatic defragging
 GUI touchups (Master Bag icon, etc.)
+
+-- Nice to haves:
 Options (Background colors, etc.)
 Remote view of bank
 Reagent tabs
-
--- Nice to haves:
 Inspect inventory of alts
 server-wide money
 item search

@@ -51,6 +51,7 @@ ns.BagFrame.DefaultConfigTable = {
 -- local --
 -----------
 
+local bagCnt = 1
 local createdBags = {}
 
 local cycleSortFuncs = {
@@ -286,13 +287,11 @@ local function DefragBags()
 	-- Gather old bag data
 	local oldBagData = {}
 	for i = 1, #createdBags do
-		for i = 1, #createdBags do
-			local gridView = createdBags[i].GridView
+		local gridView = createdBags[i].GridView
 
-			if not createdBags[i].IsMasterBag then
-				oldBagData[i] = createdBags[i]:GetConfigTable()
-				oldBagData[i].Slots = #oldBagData[i].Slots
-			end
+		if not createdBags[i].IsMasterBag then
+			oldBagData[i] = createdBags[i]:GetConfigTable()
+			oldBagData[i].Slots = #oldBagData[i].Slots
 		end
 	end
 
@@ -489,7 +488,9 @@ function ns.BagFrame:New(configTable)
 	})
 
 	table.insert(createdBags, instance)
-	instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
+	--instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
+	instance.Id = bagCnt
+	bagCnt = bagCnt + 1
 	instance.IsMasterBag = configTable.IsMasterBag
 
 	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
@@ -535,6 +536,24 @@ function ns.BagFrame:New(configTable)
 
 		instance.TreeShown = true
 		instance.Children = {}
+		instance.PhysicalBags = {}
+
+		if instance.BagFamily == ns.BagFamilies.Inventory() then
+			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER)
+			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 1)
+			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 2)
+			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 3)
+			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 4)
+		elseif instance.BagFamily == ns.BagFamilies.Bank() then
+			table.insert(instance.PhysicalBags, BANK_CONTAINER)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 1)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 2)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 3)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 4)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 5)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 6)
+			table.insert(instance.PhysicalBags, NUM_BAG_SLOTS + 7)
+		end
 
 		-- TODO: Master bag should be a logo instead
 	elseif configTable.Slots then
@@ -644,7 +663,10 @@ end
 
 function ns.BagFrame.BtnDefrag_OnClick(self, btn)
 	--DefragBags()
-	Start()
+	--Start()
+	local parent = self:GetParent()
+	parent.cor = coroutine.create(parent.Defrag)
+	parent:SetScript("OnUpdate", parent.OnUpdate)
 end
 
 ns.BagFrame[FrameworkClass.PROPERTY_GET_PREFIX .. "NumColumns"] = function(self, key)
@@ -835,3 +857,211 @@ function ns.BagFrame:ToggleBags()
 	until(i > #masterBag.Children)
 end
 
+function ns.BagFrame:IterateBagTree(func)
+	local masterBag = ns.MasterBags[self.BagFamily]
+	
+	if func(masterBag) then
+		return
+	end
+
+	for _,bag in pairs(masterBag.Children) do
+		if func(bag) then
+			return
+		end
+	end
+end
+
+local function ItemSwap(fromBag, fromSlot, toBag, toSlot)
+
+	-- Wait for lock...
+	repeat
+		local _, _, locked1 = GetContainerItemInfo(fromBag, fromSlot)
+		local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+
+		if locked1 or locked2 then
+			coroutine.yield()
+		end
+	until not (locked1 or locked2)
+
+	PickupContainerItem(fromBag, fromSlot)
+	PickupContainerItem(toBag, toSlot)
+
+	coroutine.yield()
+end
+
+function ns.BagFrame:OnUpdate( ... )
+	local alive = coroutine.resume(self.cor, self)
+	if not alive then
+		self:SetScript("OnUpdate", nil)
+	end
+end
+
+function ns.BagFrame:Defrag()
+	local masterBag = ns.MasterBags[self.BagFamily]
+	local swapBag, swapSlot = nil, nil
+
+	print(#masterBag.PhysicalBags)
+
+	for _, bagNum in pairs(masterBag.PhysicalBags) do
+		local numFreeSlots, bagType = GetContainerNumFreeSlots(bagNum)
+
+		if numFreeSlots > 0 and bagType == 0 then
+			swapBag = bagNum
+			swapSlot = GetContainerFreeSlots(bagNum)[1]
+			break
+		end
+	end
+
+	if swapBag == nil or swapSlot == nil then
+		print("Unable to defrag. Must have at least 1 available slot in a regular bag.")
+		return
+	end
+
+	ClearCursor()
+
+	local virtItemSlots = {}
+
+	-- Collect item information
+	do
+		local cnt = -1
+		self:IterateBagTree(function(bag)
+			local gridView = bag.GridView
+			for i = 1, #gridView.items do
+				local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
+				local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
+
+				if itemId ~= nil then
+					local virt = ns.BagSlot.EncodeSlotIdentifier(bagCnt + cnt, i)
+
+					if bag.IsMasterBag then
+						virt = ns.BagSlot.EncodeSlotIdentifier(bag.Id, i)
+					end
+
+					table.insert(virtItemSlots, {
+						itemCount = itemCount,
+						itemId = itemId,
+						--virt = ns.BagSlot.EncodeSlotIdentifier(bagCnt + cnt, i)
+						virt = virt
+					})
+					print(C_Item.GetItemNameByID(itemId) .. " - " .. ns.BagSlot.EncodeSlotIdentifier(bag.Id, i))
+				end
+			end
+
+			cnt = cnt + 1
+		end)
+	end
+
+	-- Gather old bag data
+	local oldBagData = {}
+	self:IterateBagTree(function(bag)
+		local gridView = bag.GridView
+
+		if not bag.IsMasterBag then
+			oldBagData[bag.Id] = bag:GetConfigTable()
+			oldBagData[bag.Id].Slots = #oldBagData[bag.Id].Slots
+		end
+	end)
+	print(bagCnt)
+	-- Delete old bags
+	for i = #masterBag.Children, 1, -1 do
+		masterBag.Children[i]:DeleteBag()
+	end
+
+	-- Spawn new bags
+	for _,v in pairs(oldBagData) do
+		ns.BagFrame:New(v)
+	end
+	print(bagCnt)
+
+	-- Rearrange items
+	local locked = {}
+	for _,v in pairs(virtItemSlots) do
+		local fromBag, fromSlot
+		local fromFound = false
+
+		-- Check if item is alreadt in place, in which case we can skip it
+		local skip = false
+		self:IterateBagTree(function(bag)
+			local gridView = bag.GridView
+
+			for i = 1, #gridView.items do
+				if gridView.items[i]:GetVirtualIdentifier() == v.virt then
+					local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
+					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
+
+					if itemId == v.itemId and itemCount == v.itemCount then
+						skip = true
+						locked[ns.BagSlot.EncodeSlotIdentifier(b, s)] = true
+						return true
+					end
+				end
+			end
+		end)
+
+		if not skip then
+
+			-- Iterate through bags to find correct items
+			self:IterateBagTree(function(bag)
+				local gridView = bag.GridView
+
+				for i = 1, #gridView.items do
+					local physId = gridView.items[i]:GetPhysicalIdentifier()
+					if not locked[physId] then
+						local b, s = ns.BagSlot.DecodeSlotIdentifier(physId)
+						local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b, s)
+
+						if itemId == v.itemId and itemCount == v.itemCount then
+							fromBag	= b
+							fromSlot = s
+							fromFound = true
+							return true
+						end
+					end
+				end
+			end)
+
+			if fromFound then
+				local toBag, toSlot
+				local toFound
+
+				-- Find "to"
+				self:IterateBagTree(function(bag)
+					print(bag.Id)
+					local gridView = bag.GridView
+
+					for i = 1, #gridView.items do
+						if gridView.items[i]:GetVirtualIdentifier() == v.virt then
+							toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
+							toFound = true
+							return true
+						end
+					end
+				end)
+
+				if toFound and not (fromBag == toBag and fromSlot == toSlot) then
+					-- TODO: Could skip swap slot if "to" slot is empty
+					-- TODO: Could skip swap slot if item in "to" is of different itemId than "from"
+					-- TODO: Could skip swap slot if itemID in "to" doesn't stack with "from", even if the itemID is equal
+
+					ItemSwap(fromBag, fromSlot, swapBag, swapSlot)
+					ItemSwap(toBag, toSlot, fromBag, fromSlot)
+					ItemSwap(swapBag, swapSlot, toBag, toSlot)
+
+					repeat
+						local _, _, locked1 = GetContainerItemInfo(swapBag, swapSlot)
+						local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
+
+						if locked1 or locked2 then
+							coroutine.yield()
+						end
+					until not (locked1 or locked2)
+
+					locked[ns.BagSlot.EncodeSlotIdentifier(toBag, toSlot)] = true
+					coroutine.yield()
+				else
+					print("Failed to find to")
+				end
+			end
+		end
+	end
+end
