@@ -55,6 +55,7 @@ ns.BagSetupFrame.BtnCreate:SetScript("OnClick", function(btn)
 		configTable = ns.BagSetupFrame.BagFrame:GetConfigTable()
 
 		if not configTable.IsMasterBag then
+			Id = ns.BagSetupFrame.BagFrame.Id
 			ns.BagSetupFrame.BagFrame:DeleteBag()
 		end
 	else
@@ -71,7 +72,7 @@ ns.BagSetupFrame.BtnCreate:SetScript("OnClick", function(btn)
 		ns.BagSetupFrame.BagFrame.NumColumns = configTable.NumColumns
 		ns.BagSetupFrame.BagFrame:Update()
 	else
-		ns.BagFrame:New(configTable)
+		ns.BagFrame:New(configTable, #ns.MasterBags[configTable.BagFamily].Children + 1)
 	end
 
 	ns.BagSetupFrame:Hide()

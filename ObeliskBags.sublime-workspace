@@ -4,6 +4,50 @@
 		"selected_items":
 		[
 			[
+				"BagF",
+				"BagFrame"
+			],
+			[
+				"inven",
+				"inventoryMasterBags"
+			],
+			[
+				"inve",
+				"inventoryMasterBags"
+			],
+			[
+				"SV_",
+				"SV_bag"
+			],
+			[
+				"Remove",
+				"RemoveChild"
+			],
+			[
+				"SV_ba",
+				"SV_bag"
+			],
+			[
+				"PLA",
+				"PLAYER_LOGOUT"
+			],
+			[
+				"GetCon",
+				"GetConfigTable"
+			],
+			[
+				"Bag",
+				"BagFrame"
+			],
+			[
+				"virt",
+				"virt"
+			],
+			[
+				"bagC",
+				"bagCnt"
+			],
+			[
 				"Ph",
 				"PhysicalBags"
 			],
@@ -60,10 +104,6 @@
 				"MasterBags"
 			],
 			[
-				"Bag",
-				"BagFamily"
-			],
-			[
 				"Ban",
 				"BankUpdate"
 			],
@@ -82,10 +122,6 @@
 			[
 				"Cate",
 				"Category"
-			],
-			[
-				"SV_",
-				"SV_BAGS_STR"
 			],
 			[
 				"Inven",
@@ -142,10 +178,6 @@
 			[
 				"GetPo",
 				"GetPosition"
-			],
-			[
-				"virt",
-				"virtItemSlots"
 			],
 			[
 				"Create",
@@ -482,38 +514,6 @@
 			[
 				"mining",
 				"miningChargeControls"
-			],
-			[
-				"pro",
-				"projectiles"
-			],
-			[
-				"proj",
-				"projectileInfo"
-			],
-			[
-				"molem",
-				"moleMachineControl"
-			],
-			[
-				"dama",
-				"damageType"
-			],
-			[
-				"perlin",
-				"perlinVal"
-			],
-			[
-				"p",
-				"pSP"
-			],
-			[
-				"inven",
-				"inventorySlot"
-			],
-			[
-				"di",
-				"dig"
 			]
 		]
 	},
@@ -661,11 +661,11 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/TODO.txt",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/ObeliskUIInclude.xml",
-		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/ObeliskBags.toc",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
@@ -792,7 +792,7 @@
 	],
 	"find":
 	{
-		"height": 42.0
+		"height": 29.0
 	},
 	"find_in_files":
 	{
@@ -807,6 +807,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"inventoryMasterBag",
+			"SV_bag",
+			"ns.BagFrame:New",
+			"New",
+			"ns.MasterBags[instance.BagFamily]",
+			"Children",
+			"s[self.Id]",
+			"[instance.Id]",
+			"[self.Id]",
+			"bagCnt",
 			"BagFamily",
 			"\")\n",
 			"self:GetParent()",
@@ -858,7 +868,7 @@
 	},
 	"incremental_find":
 	{
-		"height": 31.0
+		"height": 29.0
 	},
 	"input":
 	{
@@ -873,18 +883,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.5,
 			1.0
 		],
 		"rows":
@@ -905,7 +908,7 @@
 	"pinned_build_system": "",
 	"replace":
 	{
-		"height": 58.0
+		"height": 54.0
 	},
 	"save_all_on_build": true,
 	"select_file":

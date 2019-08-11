@@ -18,3 +18,16 @@ Bag highlight
 
 -- Small todos:
 Make bags and setupframe close on pressing escape (I believe there's some stack mechanism in wow for this purpose?)
+
+
+
+
+-- BT feedback
+Edit btn should be renamed to apply
+In general, should be configure bag instead of edit
+Move delete bag to config screen
+new edit icon. Pen?
+icon for new bag
+tooltips on buttons
+Search bar on top next to title?
+Keep focus on core feature

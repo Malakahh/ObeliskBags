@@ -45,14 +45,15 @@ ns.BagFrame.DefaultConfigTable = {
 		0,
 	},
 	BagFamily = ns.BagFamilies.Inventory(),
+	Children = {}
 }
 
 -----------
 -- local --
 -----------
 
-local bagCnt = 1
-local createdBags = {}
+-- local bagCnt = 1
+-- local createdBags = {}
 
 local cycleSortFuncs = {
 	Compare = function(arr, val1, val2)
@@ -468,9 +469,14 @@ end
 -- Class --
 -----------
 
-function ns.BagFrame:New(configTable)
-	if configTable == nil then
+function ns.BagFrame:New(configTable, Id)
+	if not configTable then
 		error(ns.Debug:sprint(addonName .. className, "Attempted to create bag with configTable == nil"))
+		return
+	end
+
+	if not Id then
+		error(ns.Debug:sprint(addonName .. className, "Attempted to create bag with Id == nil"))
 		return
 	end
 
@@ -487,19 +493,20 @@ function ns.BagFrame:New(configTable)
 		inheritsFrame = nil
 	})
 
-	table.insert(createdBags, instance)
+	instance.Id = Id
+
+	if configTable.BagFamily then
+		instance.BagFamily = configTable.BagFamily
+	end
+
+	--table.insert(createdBags, instance)
 	--instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
-	instance.Id = bagCnt
-	bagCnt = bagCnt + 1
 	instance.IsMasterBag = configTable.IsMasterBag
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	if not SV_bags then
-		error(ns.Debug:sprint(addonName .. className, "Failed SavedVariablesManager.GetRegisteredTable with key 'Bags'"))
-	end
-	SV_bags[instance.Id] = {}
-	SV_bags[instance.Id].Slots = {}
-	SV_bags[instance.Id].IsMasterBag = configTable.IsMasterBag
+	local SV_bag = instance:GetSV()
+	SV_bag.BagFamily = instance.BagFamily
+	SV_bag.Slots = {}
+	SV_bag.IsMasterBag = configTable.IsMasterBag
 	SavedVariablesManager.Save(SV_BAGS_STR)
 
 	instance:LayoutInit()
@@ -517,12 +524,6 @@ function ns.BagFrame:New(configTable)
 		instance.TitleText = configTable.Title
 	end
 
-	if configTable.BagFamily then
-		instance.BagFamily = configTable.BagFamily
-		SV_bags[instance.Id].BagFamily = instance.BagFamily
-		SavedVariablesManager.Save(SV_BAGS_STR)
-	end
-
 	-- Master bag dependant layout
 	if instance.IsMasterBag then
 		-- Manually add to gridview to skip adding to available pool again
@@ -533,6 +534,10 @@ function ns.BagFrame:New(configTable)
 		end
 
 		instance.Title:SetText(instance.Title:GetText() .. " - Master Bag - " .. instance.BagFamily)
+
+
+		SV_bag.Children = {}
+		SavedVariablesManager.Save(SV_BAGS_STR)
 
 		instance.TreeShown = true
 		instance.Children = {}
@@ -557,12 +562,14 @@ function ns.BagFrame:New(configTable)
 
 		-- TODO: Master bag should be a logo instead
 	elseif configTable.Slots then
+		local masterBag = ns.MasterBags[instance.BagFamily]
+
 		if type(configTable.Slots) == "table" and #configTable.Slots > 0 then
 			local compFunc = function(key, value, phys) return value:GetPhysicalIdentifier() == phys end
 			for k,v in pairs(configTable.Slots) do
 				local idx = ns.Util.Table.IndexWhere(ns.SlotPools[instance.BagFamily].items, compFunc, v)
 				local slot = table.remove(ns.SlotPools[instance.BagFamily].items, idx)
-				ns.MasterBags[instance.BagFamily]:RemoveSlot(slot)
+				masterBag:RemoveSlot(slot)
 				instance:AddSlot(slot)
 			end
 		elseif type(configTable.Slots) == "number" then
@@ -578,7 +585,7 @@ function ns.BagFrame:New(configTable)
 			end)
 
 			for i = 1, #slots do
-				ns.MasterBags[instance.BagFamily]:RemoveSlot(slots[i])
+				masterBag:RemoveSlot(slots[i])
 			 	instance:AddSlot(slots[i])
 			end
 		end
@@ -587,15 +594,37 @@ function ns.BagFrame:New(configTable)
 		local gridWidth, gridHeight = instance.GridView:GetCalculatedGridSize()
 		instance:SetSize(gridWidth, gridHeight)
 
-		table.insert(ns.MasterBags[instance.BagFamily].Children, instance)
+		masterBag:AddChild(instance)
 
 		instance:Update()
-		ns.MasterBags[instance.BagFamily]:Update()
+		masterBag:Update()
 	end
 
 	instance:LayoutInitDelayed()
 
+
 	return instance
+end
+
+function ns.BagFrame:AddChild(child)
+	assert(self.IsMasterBag, "Attempted to call AddChild on a non-master bag.")
+
+	print("Adding child: " .. child.Id)
+	self.Children[child.Id] = child
+
+	local SV_bag = self:GetSV()
+	SV_bag.Children[child.Id] = child:GetConfigTable()
+	SavedVariablesManager.Save(SV_BAGS_STR)
+end
+
+function ns.BagFrame:RemoveChild(child)
+	assert(self.IsMasterBag, "Attempted to call RemoveChild on a non-master bag.")
+
+	self.Children[child.Id] = nil
+
+	local SV_bag = self:GetSV()
+	SV_bag[child.Id] = nil
+	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
 function ns.BagFrame:SetPosition(pos)
@@ -603,9 +632,10 @@ function ns.BagFrame:SetPosition(pos)
 	self:ClearAllPoints()
 	self:SetPoint(unpack(pos))
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	SV_bags[self.Id].Position = pos
-	SV_bags[self.Id].Position[2] = nil
+	local SV_bag = self:GetSV()
+
+	SV_bag.Position = pos
+	SV_bag.Position[2] = nil -- Don't save parent table
 	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
@@ -617,11 +647,18 @@ function ns.BagFrame:GetConfigTable()
 		Slots = {}, -- Added below
 		Position = { self:GetPoint() },
 		BagFamily = self.BagFamily,
+		Children = {}
 	}
 
 	for k,_ in pairs(ns.BagFrame.DefaultConfigTable) do
-		assert(configTable[k] ~= nil)
+		assert(configTable[k] ~= nil, "GetConfigTable does not have the same keys as ns.BagFrame.DefaultConfigTable")
 	end	
+
+	if self.IsMasterBag then
+		for _,v in pairs(self.Children) do
+			table.insert(configTable.Children, v:GetConfigTable())
+		end
+	end
 
 	for _,v in pairs(self.GridView.items) do
 		table.insert(configTable.Slots, v:GetPhysicalIdentifier())
@@ -640,8 +677,8 @@ end
 function ns.BagFrame.OnMouseUp(self, btn)
 	self:StopMovingOrSizing()
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	SV_bags[self.Id].Position = { self:GetPoint() }
+	local SV_bag = self:GetSV()
+	SV_bag.Position = { self:GetPoint() }
 	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
@@ -662,8 +699,6 @@ function ns.BagFrame.BtnConfig_OnClick(self, btn)
 end
 
 function ns.BagFrame.BtnDefrag_OnClick(self, btn)
-	--DefragBags()
-	--Start()
 	local parent = self:GetParent()
 	parent.cor = coroutine.create(parent.Defrag)
 	parent:SetScript("OnUpdate", parent.OnUpdate)
@@ -676,8 +711,8 @@ end
 ns.BagFrame[FrameworkClass.PROPERTY_SET_PREFIX .. "NumColumns"] = function(self, key, value)
 	self.GridView:SetNumColumns(value)
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	SV_bags[self.Id].NumColumns = value
+	local SV_bag = self:GetSV()
+	SV_bag.NumColumns = value
 	SavedVariablesManager.Save(SV_BAGS_STR)
 
 	return value
@@ -690,22 +725,22 @@ end
 ns.BagFrame[FrameworkClass.PROPERTY_SET_PREFIX .. "TitleText"] = function(self, key, value)
 	self.Title:SetText(value)
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	SV_bags[self.Id].Title = self.Title:GetText()
+	local SV_bag = self:GetSV()
+	SV_bag.Title = self.Title:GetText()
 	SavedVariablesManager.Save(SV_BAGS_STR)
 
 	return value
 end
 
 function ns.BagFrame:DeleteBag()
-	self:MergeBag(ns.MasterBags[self.BagFamily])
-	ns.Util.Table.RemoveByVal(createdBags, self)
-	ns.MasterBags[self.BagFamily]:Update()
+	local masterBag = ns.MasterBags[self.BagFamily]
+	self:MergeBag(masterBag)
 
-	ns.Util.Table.RemoveByVal(ns.MasterBags[self.BagFamily].Children, self)
+	masterBag:RemoveChild(self)
+	masterBag:Update()
 
 	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	SV_bags[self.Id] = nil
+	SV_bags[masterBag.Id].Children[self.Id] = nil
 	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
@@ -732,13 +767,14 @@ function ns.BagFrame:AddSlot(slot)
 	self.GridView:AddItem(slot)
 	slot:SetOwner(self)
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	--local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	local SV_bag = self:GetSV()
 
-	if type(SV_bags[self.Id].Slots) == "number" then
-		SV_bags[self.Id].Slots = {}
+	if type(SV_bag.Slots) == "number" then
+		SV_bag.Slots = {}
 	end
 
-	table.insert(SV_bags[self.Id].Slots, slot:GetPhysicalIdentifier())
+	table.insert(SV_bag.Slots, slot:GetPhysicalIdentifier())
 	SavedVariablesManager.Save(SV_BAGS_STR)
 
 	if self.IsMasterBag then
@@ -749,8 +785,9 @@ end
 function ns.BagFrame:RemoveSlot(slot)
 	self.GridView:RemoveItem(slot)
 
-	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	ns.Util.Table.RemoveByVal(SV_bags[self.Id].Slots, slot:GetPhysicalIdentifier())
+	--local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+	local SV_bag = self:GetSV()
+	ns.Util.Table.RemoveByVal(SV_bag.Slots, slot:GetPhysicalIdentifier())
 	SavedVariablesManager.Save(SV_BAGS_STR)
 end
 
@@ -776,6 +813,31 @@ function ns.BagFrame:Update()
 
 	self:SortSlots()
 	self.GridView:Update()
+end
+
+function ns.BagFrame:GetSV()
+	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
+
+	if not TESTLOL then
+		TESTLOL = SV_bags
+	end
+
+	if not SV_bags then
+		error(ns.Debug:sprint(addonName .. className, "Failed SavedVariablesManager.GetRegisteredTable with key '" .. SV_BAGS_STR .. "'"))
+	end
+
+	if self.IsMasterBag then
+		if SV_bags[self.Id] == nil then
+			print("Adding new bag with id: " .. self.Id)
+			SV_bags[self.Id] = {}
+		end
+
+		return SV_bags[self.Id]
+	else
+		local masterBag = ns.MasterBags[self.BagFamily]
+		SV_bags[masterBag.Id].Children[self.Id] = SV_bags[masterBag.Id].Children[self.Id] or {}
+		return SV_bags[masterBag.Id].Children[self.Id]
+	end
 end
 
 function ns.BagFrame:Close()
@@ -900,8 +962,6 @@ function ns.BagFrame:Defrag()
 	local masterBag = ns.MasterBags[self.BagFamily]
 	local swapBag, swapSlot = nil, nil
 
-	print(#masterBag.PhysicalBags)
-
 	for _, bagNum in pairs(masterBag.PhysicalBags) do
 		local numFreeSlots, bagType = GetContainerNumFreeSlots(bagNum)
 
@@ -922,8 +982,9 @@ function ns.BagFrame:Defrag()
 	local virtItemSlots = {}
 
 	-- Collect item information
+	print("Collect item information")
 	do
-		local cnt = -1
+		local cnt = 0
 		self:IterateBagTree(function(bag)
 			local gridView = bag.GridView
 			for i = 1, #gridView.items do
@@ -931,16 +992,15 @@ function ns.BagFrame:Defrag()
 				local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
 
 				if itemId ~= nil then
-					local virt = ns.BagSlot.EncodeSlotIdentifier(bagCnt + cnt, i)
+					local virt = ns.BagSlot.EncodeSlotIdentifier(cnt, i)
 
 					if bag.IsMasterBag then
-						virt = ns.BagSlot.EncodeSlotIdentifier(bag.Id, i)
+						virt = ns.BagSlot.EncodeSlotIdentifier(0, i)
 					end
 
 					table.insert(virtItemSlots, {
 						itemCount = itemCount,
 						itemId = itemId,
-						--virt = ns.BagSlot.EncodeSlotIdentifier(bagCnt + cnt, i)
 						virt = virt
 					})
 					print(C_Item.GetItemNameByID(itemId) .. " - " .. ns.BagSlot.EncodeSlotIdentifier(bag.Id, i))
@@ -952,8 +1012,10 @@ function ns.BagFrame:Defrag()
 	end
 
 	-- Gather old bag data
+	print("Gather old bag data")
 	local oldBagData = {}
 	self:IterateBagTree(function(bag)
+		print("Gathering oldBagData from: " .. bag.Id)
 		local gridView = bag.GridView
 
 		if not bag.IsMasterBag then
@@ -961,19 +1023,29 @@ function ns.BagFrame:Defrag()
 			oldBagData[bag.Id].Slots = #oldBagData[bag.Id].Slots
 		end
 	end)
-	print(bagCnt)
+	
 	-- Delete old bags
+	print("Delete old bags: " .. #masterBag.Children)
 	for i = #masterBag.Children, 1, -1 do
-		masterBag.Children[i]:DeleteBag()
+		if masterBag.Children[i] then
+			masterBag.Children[i]:DeleteBag()
+			print("Deleting child: " .. i)
+		end
 	end
 
 	-- Spawn new bags
-	for _,v in pairs(oldBagData) do
-		ns.BagFrame:New(v)
+	print("Spawn new bags")
+	do
+		local cnt = 0
+		for _,v in pairs(oldBagData) do
+			cnt = cnt + 1
+			ns.BagFrame:New(v,cnt)
+			print("Spawning bag: " .. cnt)
+		end
 	end
-	print(bagCnt)
 
 	-- Rearrange items
+	print("Rearrange items")
 	local locked = {}
 	for _,v in pairs(virtItemSlots) do
 		local fromBag, fromSlot
@@ -985,11 +1057,19 @@ function ns.BagFrame:Defrag()
 			local gridView = bag.GridView
 
 			for i = 1, #gridView.items do
-				if gridView.items[i]:GetVirtualIdentifier() == v.virt then
+				local virt = gridView.items[i]:GetVirtualIdentifier()
+
+				if bag.IsMasterBag then -- Special case, always bag 0 for defragging
+					local _, slotId = ns.BagSlot.DecodeSlotIdentifier(virt)
+					virt = ns.BagSlot.EncodeSlotIdentifier(0, slotId)
+				end
+
+				if virt == v.virt then
 					local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
 					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
 
 					if itemId == v.itemId and itemCount == v.itemCount then
+						print("Item is in place, skipping")
 						skip = true
 						locked[ns.BagSlot.EncodeSlotIdentifier(b, s)] = true
 						return true
@@ -999,6 +1079,7 @@ function ns.BagFrame:Defrag()
 		end)
 
 		if not skip then
+			print("Item is not in place, moving")
 
 			-- Iterate through bags to find correct items
 			self:IterateBagTree(function(bag)
@@ -1026,11 +1107,17 @@ function ns.BagFrame:Defrag()
 
 				-- Find "to"
 				self:IterateBagTree(function(bag)
-					print(bag.Id)
 					local gridView = bag.GridView
 
 					for i = 1, #gridView.items do
-						if gridView.items[i]:GetVirtualIdentifier() == v.virt then
+						local virt = gridView.items[i]:GetVirtualIdentifier()
+
+						if bag.IsMasterBag then -- Special case, always bag 0 for defragging
+							local _, slotId = ns.BagSlot.DecodeSlotIdentifier(virt)
+							virt = ns.BagSlot.EncodeSlotIdentifier(0, slotId)
+						end
+
+						if virt == v.virt then
 							toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
 							toFound = true
 							return true

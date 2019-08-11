@@ -115,29 +115,50 @@ end
 
 local function SpawnInventoryBags()
 	local SV_Bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	local inventoryBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Inventory() end)
+	inventoryMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Inventory() end)
 
 	if bagCount > 0 then -- We have some bags saved, nice!
-		local workingSet = ns.Util.Table.Copy(inventoryBags)
+		print("We have bags: " .. bagCount)
+		PENIS = inventoryMasterBags
+
+		-- I'm not sure why this is necessary, but it seems the call to SV_bag.Children = {} in BagFrame:New() overwrites the inventoryMasterBags table. I don't see why this should be happening
+		local children = ns.Util.Table.Copy(inventoryMasterBags[1].value.Children)
 
 		-- Start with master bag
-		do
-			local inventoryMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
-			for k,v in pairs(inventoryMasterBags) do
-				ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
-				workingSet[k] = nil
-			end
-		end
+		ns.MasterBags[inventoryMasterBags[1].value.BagFamily] = ns.BagFrame:New(inventoryMasterBags[1].value, inventoryMasterBags[1].key)
 
 		-- Remaining bags
-		for k,v in pairs(workingSet) do
-			ns.BagFrame:New(v)
+		for k,v in pairs(children) do
+			ns.BagFrame:New(v, k)
 		end
+
+		-- local workingSet = ns.Util.Table.Copy(inventoryBags)
+
+		-- -- Start with master bag
+		-- do
+		-- 	local inventoryMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
+		-- 	for k,v in pairs(inventoryMasterBags) do
+		-- 		ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
+		-- 		workingSet[k] = nil
+		-- 	end
+		-- end
+
+		-- -- Remaining bags
+		-- for k,v in pairs(workingSet) do
+		-- 	ns.BagFrame:New(v)
+		-- end
 	else -- This is the first time, please be gentle
+		print("This is the first time, please be gentle")
+
+		local cnt = 0
+		for _,_ in pairs(SV_Bags) do
+			cnt = cnt + 1
+		end
+
 		local masterBagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
 		masterBagConfig.IsMasterBag = true
 		masterBagConfig.NumColumns = 10
-		ns.MasterBags[masterBagConfig.BagFamily] = ns.BagFrame:New(masterBagConfig)
+		ns.MasterBags[masterBagConfig.BagFamily] = ns.BagFrame:New(masterBagConfig, cnt)
 	end
 end
 
@@ -165,31 +186,48 @@ end
 
 local function SpawnBankBags()
 	local SV_Bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	local bankBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Bank() end)
+	local bankMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Bank() end)
 	
 	if bagCount > 0 then
-		local workingSet = ns.Util.Table.Copy(bankBags)
 
-		-- Start with master bags
-		do
-			local bankMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
-			for k,v in pairs(bankMasterBags) do
-				ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
-				workingSet[k] = nil
-			end
+		-- I'm not sure why this is necessary, but it seems the call to SV_bag.Children = {} in BagFrame:New() overwrites the inventoryMasterBags table. I don't see why this should be happening
+		local children = ns.Util.Table.Copy(bankMasterBags[1].value.Children)
+
+		-- Start with master bag
+		ns.MasterBags[bankMasterBags[1].value.BagFamily] = ns.BagFrame:New(bankMasterBags[1].value, bankMasterBags[1].key)
+
+		-- Remaining Bags
+		for k,v in pairs(children) do
+			ns.BagFrame:New(v, k)
 		end
 
-		-- Remaining bags
-		for k,v in pairs(workingSet) do
-			ns.BagFrame:New(v)
-		end
+		-- local workingSet = ns.Util.Table.Copy(bankBags)
+
+		-- -- Start with master bags
+		-- do
+		-- 	local bankMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
+		-- 	for k,v in pairs(bankMasterBags) do
+		-- 		ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
+		-- 		workingSet[k] = nil
+		-- 	end
+		-- end
+
+		-- -- Remaining bags
+		-- for k,v in pairs(workingSet) do
+		-- 	ns.BagFrame:New(v)
+		-- end
 	else -- This is the first time, please be gentle
+		local cnt = 0
+		for _,_ in pairs(SV_Bags) do
+			cnt = cnt + 1
+		end
+
 		local masterBagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
 		masterBagConfig.IsMasterBag = true
 		masterBagConfig.NumColumns = 10
 		masterBagConfig.BagFamily = ns.BagFamilies.Bank()
 		
-		ns.MasterBags[masterBagConfig.BagFamily] = ns.BagFrame:New(masterBagConfig)
+		ns.MasterBags[masterBagConfig.BagFamily] = ns.BagFrame:New(masterBagConfig, cnt)
 	end
 end
 
@@ -225,12 +263,22 @@ function frame:BANKFRAME_OPENED()
 
 	BankUpdate()
 
-	ns.MasterBags[ns.BagFamilies.Bank()]:Update()
-	ns.MasterBags[ns.BagFamilies.Bank()]:Open()
+	local masterBag = ns.MasterBags[ns.BagFamilies.Bank()]
+	masterBag:Update()
+	masterBag:Open()
+
+	for _, v in pairs(masterBag.Children) do
+		v:Open()
+	end
 end
 
 function frame:BANKFRAME_CLOSED()
-	ns.MasterBags[ns.BagFamilies.Bank()]:Close()
+	local masterBag = ns.MasterBags[ns.BagFamilies.Bank()]
+	masterBag:Close()
+
+	for _,v in pairs(masterBag.Children) do
+		v:Close()
+	end
 end
 
 function frame:PLAYERBANKSLOTS_CHANGED()
