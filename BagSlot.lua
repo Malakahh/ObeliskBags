@@ -156,6 +156,11 @@ end
 
 function ns.BagSlot:GetVirtualIdentifier()
 	local bagId = self.Owner.Id
+
+	if self.Owner.IsMasterBag then
+		bagId = 0
+	end
+
 	local slotId = ns.Util.Table.IndexOf(self.Owner.GridView.items, self)
 
 	return ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)

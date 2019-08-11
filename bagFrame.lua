@@ -52,405 +52,6 @@ ns.BagFrame.DefaultConfigTable = {
 -- local --
 -----------
 
--- local bagCnt = 1
--- local createdBags = {}
-
-local cycleSortFuncs = {
-	Compare = function(arr, val1, val2)
-		if arr[val1].virt < arr[val2].virt then
-			return -1
-		elseif arr[val1].virt > arr[val2].virt then
-			return 1
-		else
-			return 0
-		end
-	end,
-	Swap = function(arr, val1, val2)
-
-
-		print("Swap: val1: " .. val1 .. "->" .. arr[val1].phys .. " val2: " .. val2 .. "->" .. arr[val2].phys)
-		local temp = arr[val1].virt
-		arr[val1].virt = arr[val2].virt
-		arr[val2].virt = temp
-
-		-- temp = arr[val1].phys
-		-- arr[val1].phys = arr[val2].phys
-		-- arr[val2].phys = temp
-
-
-		local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(arr[val1].phys)
-		local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(arr[val2].phys)
-
-		
-		local attempts = 0
-
-		-- Wait for server...
-		repeat
-			local _, _, locked1 = GetContainerItemInfo(bagId1, slotId1)
-	        local _, _, locked2 = GetContainerItemInfo(bagId2, slotId2)
-
-	        if locked1 or locked2 then
-	            coroutine.yield()
-	        end
-
-	        attempts = attempts + 1
-	    until not (locked1 or locked2)
-
-	    print("Swapping: attempts: " .. attempts)
-
-		PickupContainerItem(bagId1, slotId1)
-		PickupContainerItem(bagId2, slotId2)
-	end
-}
-
--- local function DefragBags()
--- 	ClearCursor()
-
--- 	-- Reorder createdBags, so that we can get proper Ids
--- 	createdBags = ns.Util.Table.Arrange(createdBags)
-
--- 	-- Gather old bag data
--- 	local oldBagData = {}
--- 	local oldSlots = {}
--- 	local cnt = 1
--- 	for i = 1, #createdBags do
--- 		local gridView = createdBags[i].GridView
-
--- 		for k = 1, #gridView.items do
--- 			oldSlots[#oldSlots + 1] = {
--- 				phys = gridView.items[k]:GetPhysicalIdentifier(),
--- 				--virt = gridView.items[k]:GetVirtualIdentifier()
--- 				virt = cnt
--- 			}
--- 			cnt = cnt + 1
--- 		end
-
--- 		if not createdBags[i].IsMasterBag then
--- 			oldBagData[i] = {
--- 				numColumns = gridView:GetNumColumns(),
--- 				numSlots = gridView:ItemCount(),
--- 			}
--- 		end
--- 	end
-
--- 	-- Delete old bags
--- 	for i = #createdBags, 1, -1 do
--- 		if not createdBags[i].IsMasterBag then
--- 			createdBags[i]:DeleteBag()
--- 		end
--- 	end
-
--- 	-- Spawn new bags
--- 	for _,v in pairs(oldBagData) do
--- 		local bagConfig = ns.Util.Table.Copy(ns.BagFrame.DefaultConfigTable)
--- 		bagConfig.NumColumns = v.numColumns
--- 		bagConfig.Slots = v.numSlots
--- 		ns.BagFrame:New(bagConfig)
--- 	end
-
--- 	-- Create new list with shuffled virtual order
--- 	local newSlots = {}
--- 	for i = 1, #createdBags do
--- 		local gridView = createdBags[i].GridView
-
--- 		for n = 1, #gridView.items do
--- 			local nPhys = gridView.items[n]:GetPhysicalIdentifier()
--- 			local idx = ns.Util.Table.IndexWhere(oldSlots, function(k,v,...)
--- 				return v.phys == nPhys
--- 			end)
-
--- 			newSlots[#newSlots + 1] = oldSlots[idx]
--- 		end
--- 	end
-
--- 	-- This actually calls a selection sort for now, for simplicity. I was worried my cyclesort implementation was wrong
--- 	CycleSort.Sort(newSlots, cycleSortFuncs)
-
-	-- print("New")
-	-- do
-	-- 	local s = ""
-	-- 	for k,v in pairs(newSlots) do
-	-- 		s = s .. " " .. k .. ":".. v.virt .. ":" .. v.phys
-	-- 	end
-	-- 	print(s)
-	-- end
-
-
-
-
-	-- for i = 1, #newSlots - 1 do
-	-- 	if i ~= newSlots[i].virt then
-	-- 		print("i: " .. i .. " virt:" .. newSlots[i].virt)
-	-- 		for k = i + 1, #newSlots do
-	-- 			if i == newSlots[k].virt then
-					
-
-	-- 				local bagId1, slotId1 = ns.BagSlot.DecodeSlotIdentifier(newSlots[k].phys)
-	-- 				local bagId2, slotId2 = ns.BagSlot.DecodeSlotIdentifier(newSlots[i].phys)
-
-					
-	-- 				local attempts = 0
-
-	-- 				-- Wait for server...
-	-- 				repeat
-	-- 					local _, _, locked1 = GetContainerItemInfo(bagId1, slotId1)
-	-- 			        local _, _, locked2 = GetContainerItemInfo(bagId2, slotId2)
-
-	-- 			        if locked1 or locked2 then
-	-- 			            coroutine.yield()
-	-- 			        end
-
-	-- 			        attempts = attempts + 1
-	-- 			    until not (locked1 or locked2)
-
-	-- 			    print("Swapping: attempts: " .. attempts)
-
-	-- 				PickupContainerItem(bagId1, slotId1)
-	-- 				PickupContainerItem(bagId2, slotId2)
-
-	-- 				local temp = newSlots[k].virt
-	-- 				newSlots[k].virt = newSlots[i].virt
-	-- 				newSlots[i].virt = temp
-
-	-- 				coroutine.yield()
-	-- 			end
-	-- 		end
-	-- 	end
-	-- end
-
-	-- print("Finish")
-	-- do
-	-- 	local s = ""
-	-- 	for k,v in pairs(newSlots) do
-	-- 		s = s .. " " .. k .. ":".. v.virt .. ":" .. v.phys
-	-- 	end
-	-- 	print(s)
-	-- end
--- end
-
--- local cor
--- local frame = CreateFrame("FRAME")
--- --frame:RegisterEvent("ITEM_LOCK_CHANGED")
--- function frame:OnUpdate(elapsed)
--- 	local alive = coroutine.resume(cor)
--- 	if not alive then
--- 		self:SetScript("OnUpdate", nil)
--- 	end
--- end
-
--- local function Start()
--- 	cor = coroutine.create(DefragBags)
--- 	frame:SetScript("OnUpdate", frame.OnUpdate)
--- end
-
-local function DefragBags()
-	local swapBag, swapSlot = nil, nil
-
-	for bagNum = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-		local numFreeSlots, bagType = GetContainerNumFreeSlots(bagNum)
-
-		if numFreeSlots > 0 and bagType == 0 then
-			swapBag = bagNum
-			swapSlot = GetContainerFreeSlots(bagNum)[1]
-			break
-		end
-	end
-
-	if swapBag == nil or swapSlot == nil then
-		print("Unable to defrag. Must have at least 1 available slot in a regular bag.")
-		return
-	end
-
-	ClearCursor()
-
-	-- Reorder createdBags, so that we can get proper Ids
-	createdBags = ns.Util.Table.Arrange(createdBags)
-
-	local virtItemSlots = {}
-
-	-- Collect item information
-	for i = 1, #createdBags do
-		local gridView = createdBags[i].GridView
-		for k = 1, #gridView.items do
-			local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[k]:GetPhysicalIdentifier())
-			local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
-
-			if itemId ~= nil then
-				table.insert(virtItemSlots, {
-					itemCount = itemCount,
-					itemId = itemId,
-					virt = ns.BagSlot.EncodeSlotIdentifier(i, k)
-				})
-			end
-		end
-	end
-
-	-- Gather old bag data
-	local oldBagData = {}
-	for i = 1, #createdBags do
-		local gridView = createdBags[i].GridView
-
-		if not createdBags[i].IsMasterBag then
-			oldBagData[i] = createdBags[i]:GetConfigTable()
-			oldBagData[i].Slots = #oldBagData[i].Slots
-		end
-	end
-
-	-- Delete old bags
-	for i = #createdBags, 1, -1 do
-		if not createdBags[i].IsMasterBag then
-			createdBags[i]:DeleteBag()
-		end
-	end
-
-	-- Spawn new bags
-	for _,v in pairs(oldBagData) do
-		ns.BagFrame:New(v)
-	end
-
-	-- Rearrange items
-	local locked = {}
-	for _,v in pairs(virtItemSlots) do
-		local fromBag, fromSlot
-		local fromFound = false
-
-		-- Check if item is already in place, in which case we can skip it
-		local skip = false
-		for i = 1, #createdBags do
-			local gridView = createdBags[i].GridView
-
-			for n = 1, #gridView.items do
-				if gridView.items[n]:GetVirtualIdentifier() == v.virt then
-					local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
-					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
-
-					if itemId == v.itemId and itemCount	== v.itemCount then
-						skip = true
-						locked[ns.BagSlot.EncodeSlotIdentifier(b, s)] = true
-						break
-					end
-				end
-			end
-
-			if skip then
-				break
-			end
-		end
-
-		if not skip then
-
-			-- Iterate through bags to find correct items
-			for i = 1, #createdBags do
-				local gridView = createdBags[i].GridView
-
-				for n = 1, #gridView.items do
-					local physId = gridView.items[n]:GetPhysicalIdentifier()
-					if not locked[physId] then
-						local b, s = ns.BagSlot.DecodeSlotIdentifier(physId)
-						local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b, s)
-
-						if itemId == v.itemId and itemCount == v.itemCount then
-							fromBag = b
-							fromSlot = s
-							fromFound = true
-							break
-						end
-					end
-				end
-
-				if fromFound then
-					break
-				end
-			end
-
-			if fromFound then
-				local toBag, toSlot
-				local toFound
-
-				-- Find "to"
-				for i = 1, #createdBags do
-					local gridView = createdBags[i].GridView
-
-					for n = 1, #gridView.items do
-						if gridView.items[n]:GetVirtualIdentifier() == v.virt then
-							toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[n]:GetPhysicalIdentifier())
-							toFound = true
-							break
-						end
-					end
-
-					if toFound then
-						break
-					end
-				end
-
-				-- Swap
-				if toFound and not (fromBag == toBag and fromSlot == toSlot) then
-					-- TODO: Could skip swap slot if "to" slot is empty
-					-- TODO: Could skip swap slot if item in "to" is of different itemID than "from"
-					-- TODO: Could skip swap slot if itemID in "to" doesn't stack with "from", even if the itemID is equal
-
-					-- Wait for lock...
-					repeat
-						local _, _, locked1 = GetContainerItemInfo(fromBag, fromSlot)
-				        local _, _, locked2 = GetContainerItemInfo(swapBag, swapSlot)
-
-				        if locked1 or locked2 then
-				            coroutine.yield()
-				        end
-				    until not (locked1 or locked2)
-
-					PickupContainerItem(fromBag, fromSlot)
-					PickupContainerItem(swapBag, swapSlot)
-
-					coroutine.yield()
-
-					-- Wait for lock...
-					repeat
-						local _, _, locked1 = GetContainerItemInfo(toBag, toSlot)
-				        local _, _, locked2 = GetContainerItemInfo(fromBag, fromSlot)
-
-				        if locked1 or locked2 then
-				            coroutine.yield()
-				        end
-				    until not (locked1 or locked2)
-
-	 				PickupContainerItem(toBag, toSlot)
-	 				PickupContainerItem(fromBag, fromSlot)
-
-	 				coroutine.yield()
-
-	 				-- Wait for lock...
-	 				repeat
-						local _, _, locked1 = GetContainerItemInfo(swapBag, swapSlot)
-				        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
-
-				        if locked1 or locked2 then
-				            coroutine.yield()
-				        end
-				    until not (locked1 or locked2)
-
-	 				PickupContainerItem(swapBag, swapSlot)
-	 				PickupContainerItem(toBag, toSlot)
-
-	 				repeat
-						local _, _, locked1 = GetContainerItemInfo(swapBag, swapSlot)
-				        local _, _, locked2 = GetContainerItemInfo(toBag, toSlot)
-
-				        if locked1 or locked2 then
-				            coroutine.yield()
-				        end
-				    until not (locked1 or locked2)
-
-	 				locked[ns.BagSlot.EncodeSlotIdentifier(toBag, toSlot)] = true
-
-	 				coroutine.yield()
-				end
-			end
-		end
-	end
-end
-
 local cor
 local frame = CreateFrame("FRAME")
 function frame:OnUpdate(elapsed)
@@ -499,8 +100,6 @@ function ns.BagFrame:New(configTable, Id)
 		instance.BagFamily = configTable.BagFamily
 	end
 
-	--table.insert(createdBags, instance)
-	--instance.Id = ns.Util.Table.IndexOf(createdBags, instance)
 	instance.IsMasterBag = configTable.IsMasterBag
 
 	local SV_bag = instance:GetSV()
@@ -609,7 +208,6 @@ end
 function ns.BagFrame:AddChild(child)
 	assert(self.IsMasterBag, "Attempted to call AddChild on a non-master bag.")
 
-	print("Adding child: " .. child.Id)
 	self.Children[child.Id] = child
 
 	local SV_bag = self:GetSV()
@@ -767,7 +365,6 @@ function ns.BagFrame:AddSlot(slot)
 	self.GridView:AddItem(slot)
 	slot:SetOwner(self)
 
-	--local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
 	local SV_bag = self:GetSV()
 
 	if type(SV_bag.Slots) == "number" then
@@ -785,7 +382,6 @@ end
 function ns.BagFrame:RemoveSlot(slot)
 	self.GridView:RemoveItem(slot)
 
-	--local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
 	local SV_bag = self:GetSV()
 	ns.Util.Table.RemoveByVal(SV_bag.Slots, slot:GetPhysicalIdentifier())
 	SavedVariablesManager.Save(SV_BAGS_STR)
@@ -982,7 +578,6 @@ function ns.BagFrame:Defrag()
 	local virtItemSlots = {}
 
 	-- Collect item information
-	print("Collect item information")
 	do
 		local cnt = 0
 		self:IterateBagTree(function(bag)
@@ -1003,7 +598,7 @@ function ns.BagFrame:Defrag()
 						itemId = itemId,
 						virt = virt
 					})
-					print(C_Item.GetItemNameByID(itemId) .. " - " .. ns.BagSlot.EncodeSlotIdentifier(bag.Id, i))
+					--print(C_Item.GetItemNameByID(itemId) .. " - " .. ns.BagSlot.EncodeSlotIdentifier(bag.Id, i))
 				end
 			end
 
@@ -1012,10 +607,8 @@ function ns.BagFrame:Defrag()
 	end
 
 	-- Gather old bag data
-	print("Gather old bag data")
 	local oldBagData = {}
 	self:IterateBagTree(function(bag)
-		print("Gathering oldBagData from: " .. bag.Id)
 		local gridView = bag.GridView
 
 		if not bag.IsMasterBag then
@@ -1025,27 +618,22 @@ function ns.BagFrame:Defrag()
 	end)
 	
 	-- Delete old bags
-	print("Delete old bags: " .. #masterBag.Children)
 	for i = #masterBag.Children, 1, -1 do
 		if masterBag.Children[i] then
 			masterBag.Children[i]:DeleteBag()
-			print("Deleting child: " .. i)
 		end
 	end
 
 	-- Spawn new bags
-	print("Spawn new bags")
 	do
 		local cnt = 0
 		for _,v in pairs(oldBagData) do
 			cnt = cnt + 1
 			ns.BagFrame:New(v,cnt)
-			print("Spawning bag: " .. cnt)
 		end
 	end
 
 	-- Rearrange items
-	print("Rearrange items")
 	local locked = {}
 	for _,v in pairs(virtItemSlots) do
 		local fromBag, fromSlot
@@ -1057,19 +645,11 @@ function ns.BagFrame:Defrag()
 			local gridView = bag.GridView
 
 			for i = 1, #gridView.items do
-				local virt = gridView.items[i]:GetVirtualIdentifier()
-
-				if bag.IsMasterBag then -- Special case, always bag 0 for defragging
-					local _, slotId = ns.BagSlot.DecodeSlotIdentifier(virt)
-					virt = ns.BagSlot.EncodeSlotIdentifier(0, slotId)
-				end
-
-				if virt == v.virt then
+				if gridView.items[i]:GetVirtualIdentifier() == v.virt then
 					local b, s = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
 					local _, itemCount, _, _, _, _, _, _, _, itemId = GetContainerItemInfo(b,s)
 
 					if itemId == v.itemId and itemCount == v.itemCount then
-						print("Item is in place, skipping")
 						skip = true
 						locked[ns.BagSlot.EncodeSlotIdentifier(b, s)] = true
 						return true
@@ -1079,7 +659,6 @@ function ns.BagFrame:Defrag()
 		end)
 
 		if not skip then
-			print("Item is not in place, moving")
 
 			-- Iterate through bags to find correct items
 			self:IterateBagTree(function(bag)
@@ -1110,14 +689,7 @@ function ns.BagFrame:Defrag()
 					local gridView = bag.GridView
 
 					for i = 1, #gridView.items do
-						local virt = gridView.items[i]:GetVirtualIdentifier()
-
-						if bag.IsMasterBag then -- Special case, always bag 0 for defragging
-							local _, slotId = ns.BagSlot.DecodeSlotIdentifier(virt)
-							virt = ns.BagSlot.EncodeSlotIdentifier(0, slotId)
-						end
-
-						if virt == v.virt then
+						if gridView.items[i]:GetVirtualIdentifier() == v.virt then
 							toBag, toSlot = ns.BagSlot.DecodeSlotIdentifier(gridView.items[i]:GetPhysicalIdentifier())
 							toFound = true
 							return true

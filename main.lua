@@ -118,7 +118,6 @@ local function SpawnInventoryBags()
 	inventoryMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Inventory() end)
 
 	if bagCount > 0 then -- We have some bags saved, nice!
-		print("We have bags: " .. bagCount)
 		PENIS = inventoryMasterBags
 
 		-- I'm not sure why this is necessary, but it seems the call to SV_bag.Children = {} in BagFrame:New() overwrites the inventoryMasterBags table. I don't see why this should be happening
@@ -131,25 +130,7 @@ local function SpawnInventoryBags()
 		for k,v in pairs(children) do
 			ns.BagFrame:New(v, k)
 		end
-
-		-- local workingSet = ns.Util.Table.Copy(inventoryBags)
-
-		-- -- Start with master bag
-		-- do
-		-- 	local inventoryMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
-		-- 	for k,v in pairs(inventoryMasterBags) do
-		-- 		ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
-		-- 		workingSet[k] = nil
-		-- 	end
-		-- end
-
-		-- -- Remaining bags
-		-- for k,v in pairs(workingSet) do
-		-- 	ns.BagFrame:New(v)
-		-- end
 	else -- This is the first time, please be gentle
-		print("This is the first time, please be gentle")
-
 		local cnt = 0
 		for _,_ in pairs(SV_Bags) do
 			cnt = cnt + 1
@@ -180,10 +161,6 @@ function frame:PLAYER_LOGIN()
 	ns.MasterBags[ns.BagFamilies.Inventory()]:Update()
 end
 
--- function frame:PLAYER_LEAVING_WORLD()
--- 	SavedVariablesManager.Save()
--- end
-
 local function SpawnBankBags()
 	local SV_Bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
 	local bankMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Bank() end)
@@ -200,22 +177,6 @@ local function SpawnBankBags()
 		for k,v in pairs(children) do
 			ns.BagFrame:New(v, k)
 		end
-
-		-- local workingSet = ns.Util.Table.Copy(bankBags)
-
-		-- -- Start with master bags
-		-- do
-		-- 	local bankMasterBags = ns.Util.Table.SelectGiven(workingSet, function(k,v,...) return v.IsMasterBag end)
-		-- 	for k,v in pairs(bankMasterBags) do
-		-- 		ns.MasterBags[v.BagFamily] = ns.BagFrame:New(v)
-		-- 		workingSet[k] = nil
-		-- 	end
-		-- end
-
-		-- -- Remaining bags
-		-- for k,v in pairs(workingSet) do
-		-- 	ns.BagFrame:New(v)
-		-- end
 	else -- This is the first time, please be gentle
 		local cnt = 0
 		for _,_ in pairs(SV_Bags) do
