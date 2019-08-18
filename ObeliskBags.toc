@@ -9,6 +9,8 @@
 libs\ObeliskFramework\ObeliskInclude.xml
 BagFamilies.lua
 ItemCache.lua
+BagArea.lua
+BagArea.Layout.lua
 BagSlot.lua
 BagFrame.lua
 BagFrame.Layout.lua

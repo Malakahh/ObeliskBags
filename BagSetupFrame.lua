@@ -129,8 +129,8 @@ function ns.BagSetupFrame:Open(bagframe, isEdit, bagFamily)
 	if isEdit then
 		local configTable = bagframe:GetConfigTable()
 		self:ResetForms(#configTable.Slots, configTable.NumColumns, configTable.Title, bagframe, bagFamily)
-		self.Title:SetText("Edit - " .. configTable.Title)
-		self.BtnCreate:SetText("Edit")
+		self.Title:SetText("Configure - " .. configTable.Title)
+		self.BtnCreate:SetText("Apply")
 	else
 		local slotDefault = 1
 		self:ResetForms(slotDefault, slotDefault, ns.BagFrame.DefaultConfigTable.Title, nil, bagFamily)

@@ -166,20 +166,6 @@ function ns.BagSlot:GetVirtualIdentifier()
 	return ns.BagSlot.EncodeSlotIdentifier(bagId, slotId)
 end
 
--- function ns.BagSlot:GetIdentifier(bagId, slotId)
--- 	bagId = bagId or self:GetID()
--- 	slotId = slotId or self.ItemSlot:GetID()
-
--- 	if slotId < 10 then
--- 		ns.BagSlot.DecodeSlotIdentifier(bagId .. "0" .. slotId)
--- 		return bagId .. "0" .. slotId
--- 	else
--- 		ns.BagSlot.DecodeSlotIdentifier(bagId .. slotId)
--- 		return bagId .. slotId
--- 	end
--- end
-
 function ns.BagSlot:GetDebugText()
 	return self:GetPhysicalIdentifier()
-	--return self:GetVirtualIdentifier()
 end

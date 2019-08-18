@@ -4,6 +4,50 @@
 		"selected_items":
 		[
 			[
+				"BagSlo",
+				"BagSlots"
+			],
+			[
+				"Lay",
+				"LayoutCreateBagSlots"
+			],
+			[
+				"Bag",
+				"BagFamilies"
+			],
+			[
+				"BagFa",
+				"BagFamily"
+			],
+			[
+				"eq",
+				"EquippedBagsPanel"
+			],
+			[
+				"SetB",
+				"SetBackdropColor"
+			],
+			[
+				"Equipped",
+				"EquippedBagsPanel"
+			],
+			[
+				"master",
+				"masterBag"
+			],
+			[
+				"maste",
+				"masterBag"
+			],
+			[
+				"SV_",
+				"SV_bags"
+			],
+			[
+				"SV_ba",
+				"SV_bags"
+			],
+			[
 				"BagF",
 				"BagFrame"
 			],
@@ -16,16 +60,8 @@
 				"inventoryMasterBags"
 			],
 			[
-				"SV_",
-				"SV_bag"
-			],
-			[
 				"Remove",
 				"RemoveChild"
-			],
-			[
-				"SV_ba",
-				"SV_bag"
 			],
 			[
 				"PLA",
@@ -34,10 +70,6 @@
 			[
 				"GetCon",
 				"GetConfigTable"
-			],
-			[
-				"Bag",
-				"BagFrame"
 			],
 			[
 				"virt",
@@ -76,10 +108,6 @@
 				"IterateChildTree"
 			],
 			[
-				"BagFa",
-				"BagFamily"
-			],
-			[
 				"phys",
 				"PhysicalBags"
 			],
@@ -114,10 +142,6 @@
 			[
 				"Inve",
 				"Inventory"
-			],
-			[
-				"master",
-				"masterBagConfig"
 			],
 			[
 				"Cate",
@@ -490,30 +514,6 @@
 			[
 				"bedro",
 				"bedrock-copper"
-			],
-			[
-				"pi",
-				"picturesBedrock"
-			],
-			[
-				"tabl",
-				"tableUtil"
-			],
-			[
-				"m",
-				"miningChargeDamage"
-			],
-			[
-				"atta",
-				"attackParameters"
-			],
-			[
-				"minin",
-				"miningChargeName"
-			],
-			[
-				"mining",
-				"miningChargeControls"
 			]
 		]
 	},
@@ -661,14 +661,24 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/CollapsePanel.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/CycleSort.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/bagToggle.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/common/components/bag.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/common/core/bags.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/common/components/bagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/inventory.lua",
 		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/util.lua",
+		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/MusicBox.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/TODO.txt",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/ObeliskUIInclude.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/ObeliskBags.toc",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
 		"/D/Games/World of Warcraft/_retail_/Logs/taint.log",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/TestAddon/main.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/TestAddon/TestAddon.toc",
@@ -696,7 +706,6 @@
 		"/D/Games/Curse Client/GameInstances/MinecraftGameInstance.json",
 		"/D/Games/SkyFactory_4_Server_4.0.8/ServerStart.bat",
 		"/D/Games/SkyFactory_4_Server_4.0.8/eula.txt",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/util.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/Collections/Stack.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/ObeliskMinimap.toc",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/ObeliskSystemInclude.xml",
@@ -713,7 +722,6 @@
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/Options.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/libs/ObeliskFramework/FrameworkClass.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/_bagFrame.lua",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/QuickSort.lua",
 		"/C/Users/micha/Desktop/Skada/Skada.lua",
 		"/C/Users/micha/Desktop/Skada/BarDisplay.lua",
@@ -725,7 +733,6 @@
 		"/C/Users/micha/AppData/Local/Temp/Rar$DIa0.314/Options.lua",
 		"/C/Users/micha/Desktop/Skada/Menus.lua",
 		"/D/Games/World of Warcraft/_retail_/BlizzardInterfaceCode/Interface/FrameXML/ContainerFrame.xml",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/inventory.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/main.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/debug.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/libs/ObeliskFramework/UI/GridView.lua",
@@ -781,14 +788,7 @@
 		"/C/Users/micha/Desktop/AC_230119-213938_O_lotus_exos_125_s1_spa_.dat",
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/data.lua",
 		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/module-category.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/ammo-category.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/entity/fire.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/item.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/capsule.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/item/equipment.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/damage-type.lua",
-		"/C/Users/micha/AppData/Roaming/Factorio/factorio-current.log",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/my own/Brobots_0.0.1/prototypes/brobot/brobot.lua"
+		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/ammo-category.lua"
 	],
 	"find":
 	{
@@ -807,6 +807,22 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"\\",
+			"/",
+			"CellSize",
+			"OnUpdate",
+			"DICK",
+			"PENIS",
+			"TESTLOL",
+			"1",
+			"we have ",
+			"GetVirtualIdentifier",
+			"AddChild",
+			"SelectGiven",
+			"bagCnt",
+			"k",
+			"BagFrame:New",
+			"0",
 			"inventoryMasterBag",
 			"SV_bag",
 			"ns.BagFrame:New",

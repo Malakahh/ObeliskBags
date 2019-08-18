@@ -18,11 +18,6 @@ if not FrameworkClass then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskFrameworkClass"))
 end
 
-local CycleSort = ObeliskFrameworkManager:GetLibrary("ObeliskCycleSort", 0)
-if not CycleSort then
-	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCycleSort"))
-end
-
 local SavedVariablesManager = ObeliskFrameworkManager:GetLibrary("ObeliskSavedVariablesManager", 0)
 if not SavedVariablesManager then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskSavedVariablesManager"))
@@ -52,19 +47,7 @@ ns.BagFrame.DefaultConfigTable = {
 -- local --
 -----------
 
-local cor
-local frame = CreateFrame("FRAME")
-function frame:OnUpdate(elapsed)
-	local alive = coroutine.resume(cor)
-	if not alive then
-		self:SetScript("OnUpdate", nil)
-	end
-end
 
-local function Start()
-	cor = coroutine.create(DefragBags)
-	frame:SetScript("OnUpdate", frame.OnUpdate)
-end
 
 -----------
 -- Class --
@@ -302,6 +285,12 @@ function ns.BagFrame.BtnDefrag_OnClick(self, btn)
 	parent:SetScript("OnUpdate", parent.OnUpdate)
 end
 
+function ns.BagFrame.BtnEquippedBags_OnClick(self, btn)
+	local parent = self:GetParent()
+	parent.EquippedBagsPanel:Toggle()
+	parent:Update()
+end
+
 ns.BagFrame[FrameworkClass.PROPERTY_GET_PREFIX .. "NumColumns"] = function(self, key)
 	return self.GridView:GetNumColumns()
 end
@@ -402,7 +391,18 @@ function ns.BagFrame:Update()
 	self.GridView:SetHeight(gridHeight)
 
 	local width = gridWidth + self.padding * 2
-	local height = gridHeight + self.BtnClose:GetHeight() + self.padding + self.btnHeight
+	local height
+
+	if self.IsMasterBag then
+		height = gridHeight + self.BtnEquippedBags:GetHeight() + self.padding + self.btnHeight + self.spacing
+		if not self.EquippedBagsPanel.IsCollapsed then
+			height = height + self.EquippedBagsPanel:GetHeight()
+		else
+			height = height + 2
+		end
+	else
+		height = gridHeight + self.BtnClose:GetHeight() + self.padding + self.btnHeight
+	end
 
 	self:SetWidth(width)
 	self:SetHeight(height)
@@ -413,10 +413,6 @@ end
 
 function ns.BagFrame:GetSV()
 	local SV_bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-
-	if not TESTLOL then
-		TESTLOL = SV_bags
-	end
 
 	if not SV_bags then
 		error(ns.Debug:sprint(addonName .. className, "Failed SavedVariablesManager.GetRegisteredTable with key '" .. SV_BAGS_STR .. "'"))

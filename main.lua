@@ -56,7 +56,7 @@ local function CollectInventorySlots()
 			local slotNum
 			for slotNum = 1, maxNumSlots do
 				local slot = ns.BagSlot:New(bagNum, slotNum)
-				slot:SetSize(ns.CellSize, ns.CellSize)
+				slot:SetSize(37, 37)
 				allInventorySlots[slot:GetPhysicalIdentifier()] = slot
 			end
 		end
@@ -84,7 +84,7 @@ local function CollectBankSlots()
 			local maxNumSlots = GetContainerNumSlots(bagNum)
 			for slotNum = 1, maxNumSlots do
 				local slot = ns.BagSlot:New(bagNum, slotNum)
-				slot:SetSize(ns.CellSize, ns.CellSize)
+				slot:SetSize(37, 37)
 				allBankSlots[slot:GetPhysicalIdentifier()] = slot
 			end
 
