@@ -29,3 +29,9 @@ icon for new bag
 tooltips on buttons
 Search bar on top next to title?
 Keep focus on core feature
+
+
+Auto Defragging:
+- When bags are added / removed
+- After deleting bag
+- After adding / removing slots
