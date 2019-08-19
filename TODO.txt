@@ -1,5 +1,5 @@
 -- Priority:
-Bag display (so that you can swap bags)
+Highlight bag inventories on mouse hover
 Handle when bags are added / removed
 support for specialised bags (herb, engineering, ammo, soulshard, etc.)
 Automatic defragging

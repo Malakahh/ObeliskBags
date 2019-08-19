@@ -4,20 +4,28 @@
 		"selected_items":
 		[
 			[
+				"Upd",
+				"Update_Layout"
+			],
+			[
+				"OnCli",
+				"OnClickHandler"
+			],
+			[
+				"Bag",
+				"BagFamily"
+			],
+			[
+				"BagFa",
+				"BagFamilies"
+			],
+			[
 				"BagSlo",
 				"BagSlots"
 			],
 			[
 				"Lay",
 				"LayoutCreateBagSlots"
-			],
-			[
-				"Bag",
-				"BagFamilies"
-			],
-			[
-				"BagFa",
-				"BagFamily"
 			],
 			[
 				"eq",
@@ -506,14 +514,6 @@
 			[
 				"pic",
 				"picturesBedrockIron"
-			],
-			[
-				"bedr",
-				"bedrock-iron"
-			],
-			[
-				"bedro",
-				"bedrock-copper"
 			]
 		]
 	},
@@ -661,8 +661,13 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFamilies.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/Bagnon.toc",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/GridView.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/main.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/CollapsePanel.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/CycleSort.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/bagToggle.lua",
@@ -677,7 +682,6 @@
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/ObeliskUIInclude.xml",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/ObeliskBags.toc",
 		"/D/Games/World of Warcraft/_retail_/Logs/taint.log",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/TestAddon/main.lua",
@@ -710,13 +714,11 @@
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskMinimap/ObeliskMinimap.toc",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/ObeliskSystemInclude.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkClass.lua",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/GridView.lua",
 		"/C/Users/micha/AppData/Roaming/Sublime Text 3/Packages/User/ObeliskLib.sublime-snippet",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/SerializableData.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrameData.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/ObeliskInclude.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkClassOld.lua",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/main.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bagFrame.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/FrameworkManager.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/Options.lua",
@@ -786,13 +788,11 @@
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/locale/en/en.cfg",
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/world/caveWall.lua",
 		"/C/Users/micha/Desktop/AC_230119-213938_O_lotus_exos_125_s1_spa_.dat",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/data.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/module-category.lua",
-		"/D/Games/Steam/steamapps/common/Factorio/data/base/prototypes/categories/ammo-category.lua"
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/data.lua"
 	],
 	"find":
 	{
-		"height": 29.0
+		"height": 42.0
 	},
 	"find_in_files":
 	{
@@ -807,6 +807,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"bag:",
+			"BAG",
+			"bag",
+			"Bags",
+			"Update",
+			"Update_Layout",
+			"self:GetID()",
+			"ns.CellSize",
+			".icon",
+			"icon",
+			"CellSize",
 			"\\",
 			"/",
 			"CellSize",
