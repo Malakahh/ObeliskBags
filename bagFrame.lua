@@ -39,7 +39,7 @@ ns.BagFrame.DefaultConfigTable = {
 		0,
 		0,
 	},
-	BagFamily = ns.BagFamilies.Inventory(),
+	BagFamily = ns.BagFamilies.Backpack(),
 	Children = {}
 }
 
@@ -125,7 +125,7 @@ function ns.BagFrame:New(configTable, Id)
 		instance.Children = {}
 		instance.PhysicalBags = {}
 
-		if instance.BagFamily == ns.BagFamilies.Inventory() then
+		if instance.BagFamily == ns.BagFamilies.Backpack() then
 			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER)
 			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 1)
 			table.insert(instance.PhysicalBags, BACKPACK_CONTAINER + 2)

@@ -142,30 +142,7 @@ function ns.BagFrame:LayoutInit()
 end
 
 function ns.BagFrame:LayoutInitDelayed()
-	if self.IsMasterBag and self.BagFamily ~= ns.BagFamilies.Inventory() then
+	if self.IsMasterBag and self.BagFamily ~= ns.BagFamilies.Backpack() then
 		self.MoneyFrame:Hide()
 	end
-end
-
-function ns.BagFrame:LayoutCreateBagSlots()
-	-- self.BagSlots = {}
-	-- local width = self.padding
-
-	-- if self.BagFamily == ns.BagFamilies.Inventory() then
-	-- 	for i = BACKPACK_CONTAINER + 1, NUM_BAG_SLOTS do
-			
-	-- 		--BagSlotButtonTemplate
-	-- 		local bagSlot = CreateFrame("ITEMBUTTON", addonName .. "BagSlot" .. i, self, "ContainerFrameItemButtonTemplate")
-
-	-- 		bagSlot:SetPoint("TOPLEFT", self.EquippedBagsPanel, "TOPLEFT", width, -self.padding)
-	-- 		bagSlot:SetID(CONTAINER_BAG_OFFSET+i)
-	-- 		width = width + bagSlot:GetWidth() + self.spacing * 2
-
-	-- 		table.insert(self.BagSlots, bagSlot)
-	-- 	end
-	-- elseif self.BagFamily == ns.BagFamilies.Bank() then
-
-	-- end
-
-	-- self.EquippedBagsPanel.Width = width - self.spacing
 end

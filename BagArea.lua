@@ -18,6 +18,11 @@ if not FrameworkClass then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskFrameworkClass"))
 end
 
+local CustomEvents = ObeliskFrameworkManager:GetLibrary("ObeliskCustomEvents", 0)
+if not CustomEvents then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCustomEvents"))
+end
+
 ---------------
 -- Constants --
 ---------------
@@ -108,21 +113,46 @@ end
 
 function ns.BagArea.OnEnter(self)
 	local area = self:GetParent():GetParent()
+	local id = self:GetID()
 
 	if self:GetRight() > (GetScreenWidth() / 2) then
 		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 	else
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	end
+	area:UpdateTooltip(id)
 
-	area:UpdateTooltip(self:GetID())
+	if (ns.BagFamilies:IsBackpack(id) or
+		ns.BagFamilies:IsBank(id) or
+		ns.BagFamilies:IsReagents(id) or
+		self.link) then
+
+		local maxNumSlots = GetContainerNumSlots(id)
+		for i = 1, maxNumSlots do
+			local slot = _G[addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(id, i)]
+			slot.ItemSlot.BattlepayItemTexture:Show()
+		end
+	end
 end
 
 function ns.BagArea.OnLeave(self)
 	local area = self:GetParent():GetParent()
+	local id = self:GetID()
 
 	if GameTooltip:IsOwned(self) then
 		GameTooltip:Hide()
+	end
+
+	if (ns.BagFamilies:IsBackpack(id) or
+		ns.BagFamilies:IsBank(id) or
+		ns.BagFamilies:IsReagents(id) or
+		self.link) then
+
+		local maxNumSlots = GetContainerNumSlots(id)
+		for i = 1, maxNumSlots do
+			local slot = _G[addonName .. "ItemSlotContainer" .. ns.BagSlot.EncodeSlotIdentifier(id, i)]
+			slot.ItemSlot.BattlepayItemTexture:Hide()
+		end
 	end
 end
 
@@ -150,3 +180,58 @@ function ns.BagArea.OnDrag(self)
 	end
 end
 
+function ns.BagArea:CheckBagsChanged()
+	local startIdx, endIdx
+	if ns.BagFamilies:IsBackpack(self.AreaType) then
+		startIdx = BACKPACK_CONTAINER + 1
+		endIdx = NUM_BAG_SLOTS
+	elseif ns.BagFamilies:IsBank(self.AreaType) then
+		startIdx = NUM_BAG_SLOTS + 1
+		endIdx = NUM_BAG_SLOTS + NUM_BANKBAGSLOTS
+	end
+
+	if startIdx and endIdx then
+		local firstTime = false
+		if not self.CachedBagsChanged then -- first time
+			self.CachedBagsChanged = {}
+			firstTime = true
+		end
+
+		if firstTime then
+			for i = startIdx, endIdx do
+				self.CachedBagsChanged[i] = {
+					Family = ns.BagFamilies:BagIDToBagFamily(i),
+					SlotCount = GetContainerNumSlots(i)
+				}
+			end
+		else
+			for i = startIdx, endIdx do
+				local family = ns.BagFamilies:BagIDToBagFamily(i)
+				local slotCount = GetContainerNumSlots(i)
+
+				if family ~= self.CachedBagsChanged[i].Family or slotCount ~= self.CachedBagsChanged[i].SlotCount then
+					CustomEvents:Fire("CUSTOM_EVENT_EQUIPPED_BAGS_CHANGED", i)
+					return true
+				end
+			end
+		end
+	end
+
+	return false
+end
+
+function ns.BagArea:BAG_UPDATE(bagID)
+	if self:CheckBagsChanged() then
+		return
+	end
+
+	for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
+		if self.Bags[i] then
+			self:Update_Layout(i)
+		end
+	end
+end
+
+function ns.BagArea:REAGENTBANK_PURCHASED()
+	self:Update_Layout(REAGENTBANK_CONTAINER)
+end

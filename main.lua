@@ -16,6 +16,11 @@ if not SavedVariablesManager then
 	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskSavedVariablesManager"))
 end
 
+local CustomEvents = ObeliskFrameworkManager:GetLibrary("ObeliskCustomEvents", 0)
+if not CustomEvents then
+	error(ns.Debug:sprint(addonName .. className, "Failed to load ObeliskCustomEvents"))
+end
+
 -----------
 -- local --
 -----------
@@ -68,7 +73,7 @@ local function CollectInventorySlots()
 			local maxNumSlots = GetContainerNumSlots(bagNum)
 			local slotNum
 			for slotNum = 1, maxNumSlots do
-				ns.SlotPools[ns.BagFamilies.Inventory()]:Push(allInventorySlots[ns.BagSlot.EncodeSlotIdentifier(bagNum, slotNum)])
+				ns.SlotPools[ns.BagFamilies.Backpack()]:Push(allInventorySlots[ns.BagSlot.EncodeSlotIdentifier(bagNum, slotNum)])
 			end
 		end
 	end
@@ -115,16 +120,17 @@ end
 
 local function SpawnInventoryBags()
 	local SV_Bags = SavedVariablesManager.GetRegisteredTable(SV_BAGS_STR)
-	inventoryMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Inventory() end)
+	inventoryMasterBags, bagCount = ns.Util.Table.SelectGiven(SV_Bags, function(k,v,...) return v.BagFamily == ns.BagFamilies.Backpack() end)
 
 	if bagCount > 0 then -- We have some bags saved, nice!
-		PENIS = inventoryMasterBags
 
 		-- I'm not sure why this is necessary, but it seems the call to SV_bag.Children = {} in BagFrame:New() overwrites the inventoryMasterBags table. I don't see why this should be happening
 		local children = ns.Util.Table.Copy(inventoryMasterBags[1].value.Children)
 
 		-- Start with master bag
-		ns.MasterBags[inventoryMasterBags[1].value.BagFamily] = ns.BagFrame:New(inventoryMasterBags[1].value, inventoryMasterBags[1].key)
+		if not ns.MasterBags[inventoryMasterBags[1].value.BagFamily] then
+			ns.MasterBags[inventoryMasterBags[1].value.BagFamily] = ns.BagFrame:New(inventoryMasterBags[1].value, inventoryMasterBags[1].key)
+		end
 
 		-- Remaining bags
 		for k,v in pairs(children) do
@@ -146,11 +152,11 @@ end
 function frame:PLAYER_LOGIN()
 	ns.MasterBags = {}
 
-	CollectInventorySlots()
 	SavedVariablesManager.Init(OB_SV)
 	SavedVariablesManager.CreateRegisteredTable(SV_BAGS_STR)
 	SavedVariablesManager.Save()
 
+	CollectInventorySlots()
 	SpawnInventoryBags()
 
 	local bagNum
@@ -158,7 +164,7 @@ function frame:PLAYER_LOGIN()
 		self:BAG_UPDATE(bagNum)
 	end
 
-	ns.MasterBags[ns.BagFamilies.Inventory()]:Update()
+	ns.MasterBags[ns.BagFamilies.Backpack()]:Update()
 end
 
 local function SpawnBankBags()
@@ -260,3 +266,10 @@ function frame:BAG_UPDATE(bagId)
 
 	BankUpdate()
 end
+
+local function CUSTOM_EVENT_EQUIPPED_BAGS_CHANGED(bagId)
+	print("EQUIPPED_BAGS_CHANGED: " .. bagId)
+
+end
+
+CustomEvents:Register("CUSTOM_EVENT_EQUIPPED_BAGS_CHANGED", CUSTOM_EVENT_EQUIPPED_BAGS_CHANGED)

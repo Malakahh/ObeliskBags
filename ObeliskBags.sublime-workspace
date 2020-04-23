@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"Deg",
+				"Defrag"
+			],
+			[
+				"Obeli",
+				"ObeliskFrameworkManager"
+			],
+			[
+				"bag",
+				"bagType"
+			],
+			[
+				"Back",
+				"BackpackOrBank"
+			],
+			[
+				"backp",
+				"BackpackOrBank"
+			],
+			[
+				"IsBackp",
+				"IsBackpackBag"
+			],
+			[
+				"IsBa",
+				"IsBank"
+			],
+			[
+				"fir",
+				"firstTime"
+			],
+			[
+				"NUM",
+				"NUM_BAG_SLOTS"
+			],
+			[
 				"Upd",
 				"Update_Layout"
 			],
@@ -478,42 +514,6 @@
 			[
 				"digg",
 				"diggingWidth"
-			],
-			[
-				"play",
-				"playerId"
-			],
-			[
-				"rotat",
-				"rotationInRad"
-			],
-			[
-				"dig",
-				"diggingWidth"
-			],
-			[
-				"entit",
-				"entityPos"
-			],
-			[
-				"enti",
-				"entityPos"
-			],
-			[
-				"map",
-				"mapColorBedrockIron"
-			],
-			[
-				"mapColo",
-				"mapColorBedrock"
-			],
-			[
-				"mapCo",
-				"mapColorBedrock"
-			],
-			[
-				"pic",
-				"picturesBedrockIron"
 			]
 		]
 	},
@@ -662,12 +662,15 @@
 	"file_history":
 	[
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFamilies.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/TODO.txt",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/CustomEvents.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/main.lua",
+		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagArea.Layout.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/Bagnon.toc",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagSlot.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/GridView.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/BagFrame.Layout.lua",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/main.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/CollapsePanel.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/System/CycleSort.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/Bagnon/components/bagToggle.lua",
@@ -678,7 +681,6 @@
 		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/ObeliskBags.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/util.lua",
 		"/D/Games/World of Warcraft/_retail_/WTF/Account/MUKTA/SavedVariables/MusicBox.lua",
-		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/TODO.txt",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.lua",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/bindings.xml",
 		"/D/Games/World of Warcraft/_retail_/Interface/AddOns/ObeliskBags/libs/ObeliskFramework/UI/ObeliskUIInclude.xml",
@@ -786,13 +788,11 @@
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/control.lua",
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/controls/vehicles/moleMachineControls.lua",
 		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/locale/en/en.cfg",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/world/caveWall.lua",
-		"/C/Users/micha/Desktop/AC_230119-213938_O_lotus_exos_125_s1_spa_.dat",
-		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/data.lua"
+		"/C/Users/micha/AppData/Roaming/Factorio/mods/Dungeon_0.0.1/prototypes/world/caveWall.lua"
 	],
 	"find":
 	{
-		"height": 42.0
+		"height": 29.0
 	},
 	"find_in_files":
 	{
@@ -807,6 +807,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Inventory",
+			"()",
+			"_G",
+			"delete",
+			"PhysicalBags",
+			"delete",
+			"CustomEvents",
+			"Bank",
+			"Inventory",
+			"self:GetID",
 			"bag:",
 			"BAG",
 			"bag",

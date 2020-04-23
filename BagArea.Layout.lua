@@ -52,7 +52,6 @@ function ns.BagArea:LayoutInit()
 	self.GridView:Update()
 
 	self:RegisterEvent("BAG_UPDATE")
-	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("REAGENTBANK_PURCHASED")
 end
 
@@ -94,18 +93,6 @@ function ns.BagArea:SpawnBagSlot(id)
 	self:Update_Layout(id)
 
 	return bag
-end
-
-function ns.BagArea:BAG_UPDATE(bagID)
-	for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-		if self.Bags[i] then
-			self:Update_Layout(i)
-		end
-	end
-end
-
-function ns.BagArea:REAGENTBANK_PURCHASED()
-	self:Update_Layout(REAGENTBANK_CONTAINER)
 end
 
 function ns.BagArea:Update_Layout(bagID)
